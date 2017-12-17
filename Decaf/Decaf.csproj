@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <RootNamespace>CoffeeMachine</RootNamespace>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Antlr4" Version="4.6.4" />
+    <PackageReference Include="Microsoft.CodeAnalysis" Version="2.6.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="BrewOptions.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="DecafVisitor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Grammars\CharHelpers.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Unit.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Antlr4 Include="Grammars\Java8.g4">
+      <Generator>MSBuild:Compile</Generator>
+      <CustomToolNamespace>CoffeeMachine.Grammars</CustomToolNamespace>
+      <Listener>false</Listener>
+      <Visitor>true</Visitor>
+    </Antlr4>
+  </ItemGroup>
+
+</Project>

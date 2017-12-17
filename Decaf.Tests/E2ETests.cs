@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -6,7 +7,7 @@ using Xunit;
 
 namespace CoffeeMachine.Tests
 {
-    public class DecafTests
+    public class E2ETests
     {
         private static string GetThisFilePath([CallerFilePath] string path = null)
         {
@@ -21,10 +22,10 @@ namespace CoffeeMachine.Tests
 
             for (int i = 1; ; i++)
             {
-                string inFile = $"Test{i}-in.java";
-                string outFile = $"Test{i}-out.cs";
+                string inFile = Path.Combine(testDataDirectory, $"Test{i}-in.java");
+                string outFile = Path.Combine(testDataDirectory, $"Test{i}-out.cs");
 
-                if (!File.Exists(inFile) || !File.Exists(outFile))
+                if (!testFiles.Contains(inFile) || !testFiles.Contains(outFile))
                 {
                     break;
                 }
@@ -37,7 +38,8 @@ namespace CoffeeMachine.Tests
         [MemberData(nameof(Brew_Data))]
         public void Brew(string javaCode, string expectedCSharpCode)
         {
-            Assert.Equal(expectedCSharpCode, Decaf.Brew(javaCode));
+            var actualCSharpCode = Decaf.Brew(javaCode);
+            Assert.Equal(expectedCSharpCode, actualCSharpCode);
         }
     }
 }

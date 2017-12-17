@@ -806,8 +806,16 @@ ifThenElseStatementNoShortIf
 	;
 
 assertStatement
+	:	assertStatementNoMessage
+	|	assertStatementWithMessage
+	;
+
+assertStatementNoMessage
 	:	'assert' expression ';'
-	|	'assert' expression ':' expression ';'
+	;
+
+assertStatementWithMessage
+	:	'assert' expression ':' expression ';'
 	;
 
 switchStatement
