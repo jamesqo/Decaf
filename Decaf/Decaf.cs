@@ -1,6 +1,6 @@
 using Antlr4.Runtime;
-using CoffeeMachine.Grammars;
-using static CoffeeMachine.Grammars.Java8Parser;
+using CoffeeMachine.Internal;
+using CoffeeMachine.Internal.Grammars;
 
 namespace CoffeeMachine
 {

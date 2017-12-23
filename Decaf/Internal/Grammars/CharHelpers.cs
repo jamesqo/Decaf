@@ -1,4 +1,4 @@
-﻿namespace CoffeeMachine.Grammars
+﻿namespace CoffeeMachine.Internal.Grammars
 {
     internal static class CharHelpers
     {

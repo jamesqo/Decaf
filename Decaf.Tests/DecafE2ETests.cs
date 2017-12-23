@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -7,7 +6,7 @@ using Xunit;
 
 namespace CoffeeMachine.Tests
 {
-    public class E2ETests
+    public class DecafE2ETests
     {
         private static string GetThisFilePath([CallerFilePath] string path = null)
         {

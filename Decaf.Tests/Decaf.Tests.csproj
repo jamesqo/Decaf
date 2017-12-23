@@ -4,13 +4,6 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <RootNamespace>CoffeeMachine.Tests</RootNamespace>
     <IsPackable>false</IsPackable>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <LangVersion>latest</LangVersion>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
@@ -28,11 +21,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Decaf\Decaf.csproj" />
   </ItemGroup>
-  
-  <ItemGroup>
-    <Compile Update="UnitTests.cs">
-      <SubType>Code</SubType>
-    </Compile>
-  </ItemGroup>
+ 
 
 </Project>

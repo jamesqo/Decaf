@@ -1,4 +1,4 @@
-﻿namespace CoffeeMachine
+﻿namespace CoffeeMachine.Internal
 {
     internal struct Unit
     {

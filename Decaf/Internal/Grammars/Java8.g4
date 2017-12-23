@@ -114,16 +114,16 @@ classOrInterfaceType
 	;
 
 classType
-	:	annotation* Identifier typeArguments?
-	|	classOrInterfaceType '.' annotation* Identifier typeArguments?
+	:	annotation* Identifier typeArgumentsOrNot
+	|	classOrInterfaceType '.' annotation* Identifier typeArgumentsOrNot
 	;
 
 classType_lf_classOrInterfaceType
-	:	'.' annotation* Identifier typeArguments?
+	:	'.' annotation* Identifier typeArgumentsOrNot
 	;
 
 classType_lfno_classOrInterfaceType
-	:	annotation* Identifier typeArguments?
+	:	annotation* Identifier typeArgumentsOrNot
 	;
 
 interfaceType
@@ -171,6 +171,10 @@ additionalBound
 
 typeArguments
 	:	'<' typeArgumentList '>'
+	;
+
+typeArgumentsOrNot
+	:	typeArguments?
 	;
 
 typeArgumentList
@@ -390,16 +394,16 @@ unannClassOrInterfaceType
 	;
 
 unannClassType
-	:	Identifier typeArguments?
-	|	unannClassOrInterfaceType '.' annotation* Identifier typeArguments?
+	:	Identifier typeArgumentsOrNot
+	|	unannClassOrInterfaceType '.' annotation* Identifier typeArgumentsOrNot
 	;
 
 unannClassType_lf_unannClassOrInterfaceType
-	:	'.' annotation* Identifier typeArguments?
+	:	'.' annotation* Identifier typeArgumentsOrNot
 	;
 
 unannClassType_lfno_unannClassOrInterfaceType
-	:	Identifier typeArguments?
+	:	Identifier typeArgumentsOrNot
 	;
 
 unannInterfaceType
@@ -534,10 +538,10 @@ constructorBody
 	;
 
 explicitConstructorInvocation
-	:	typeArguments? 'this' '(' argumentList? ')' ';'
-	|	typeArguments? 'super' '(' argumentList? ')' ';'
-	|	expressionName '.' typeArguments? 'super' '(' argumentList? ')' ';'
-	|	primary '.' typeArguments? 'super' '(' argumentList? ')' ';'
+	:	typeArgumentsOrNot 'this' '(' argumentListOrNot ')' ';'
+	|	typeArgumentsOrNot 'super' '(' argumentListOrNot ')' ';'
+	|	expressionName '.' typeArgumentsOrNot 'super' '(' argumentListOrNot ')' ';'
+	|	primary '.' typeArgumentsOrNot 'super' '(' argumentListOrNot ')' ';'
 	;
 
 enumDeclaration
@@ -553,7 +557,7 @@ enumConstantList
 	;
 
 enumConstant
-	:	enumConstantModifier* Identifier ('(' argumentList? ')')? classBody?
+	:	enumConstantModifier* Identifier ('(' argumentListOrNot ')')? classBody?
 	;
 
 enumConstantModifier
@@ -1053,18 +1057,18 @@ primaryNoNewArray_lfno_primary_lfno_arrayAccess_lfno_primary
 	;
 
 classInstanceCreationExpression
-	:	'new' typeArguments? annotation* Identifier ('.' annotation* Identifier)* typeArgumentsOrDiamond? '(' argumentList? ')' classBody?
-	|	expressionName '.' 'new' typeArguments? annotation* Identifier typeArgumentsOrDiamond? '(' argumentList? ')' classBody?
-	|	primary '.' 'new' typeArguments? annotation* Identifier typeArgumentsOrDiamond? '(' argumentList? ')' classBody?
+	:	'new' typeArgumentsOrNot annotation* Identifier ('.' annotation* Identifier)* typeArgumentsOrDiamond? '(' argumentListOrNot ')' classBody?
+	|	expressionName '.' 'new' typeArgumentsOrNot annotation* Identifier typeArgumentsOrDiamond? '(' argumentListOrNot ')' classBody?
+	|	primary '.' 'new' typeArgumentsOrNot annotation* Identifier typeArgumentsOrDiamond? '(' argumentListOrNot ')' classBody?
 	;
 
 classInstanceCreationExpression_lf_primary
-	:	'.' 'new' typeArguments? annotation* Identifier typeArgumentsOrDiamond? '(' argumentList? ')' classBody?
+	:	'.' 'new' typeArgumentsOrNot annotation* Identifier typeArgumentsOrDiamond? '(' argumentListOrNot ')' classBody?
 	;
 
 classInstanceCreationExpression_lfno_primary
-	:	'new' typeArguments? annotation* Identifier ('.' annotation* Identifier)* typeArgumentsOrDiamond? '(' argumentList? ')' classBody?
-	|	expressionName '.' 'new' typeArguments? annotation* Identifier typeArgumentsOrDiamond? '(' argumentList? ')' classBody?
+	:	'new' typeArgumentsOrNot annotation* Identifier ('.' annotation* Identifier)* typeArgumentsOrDiamond? '(' argumentListOrNot ')' classBody?
+	|	expressionName '.' 'new' typeArgumentsOrNot annotation* Identifier typeArgumentsOrDiamond? '(' argumentListOrNot ')' classBody?
 	;
 
 typeArgumentsOrDiamond
@@ -1111,50 +1115,62 @@ arrayAccess_lfno_primary
 	;
 
 methodInvocation
-	:	methodName '(' argumentList? ')'
-	|	typeName '.' typeArguments? Identifier '(' argumentList? ')'
-	|	expressionName '.' typeArguments? Identifier '(' argumentList? ')'
-	|	primary '.' typeArguments? Identifier '(' argumentList? ')'
-	|	'super' '.' typeArguments? Identifier '(' argumentList? ')'
-	|	typeName '.' 'super' '.' typeArguments? Identifier '(' argumentList? ')'
+	:	simpleMethodInvocation
+	|	notSoSimpleMethodInvocation
+	;
+
+simpleMethodInvocation
+	:	methodName '(' argumentListOrNot ')'
+	;
+
+notSoSimpleMethodInvocation
+	:	typeName '.' typeArgumentsOrNot Identifier '(' argumentListOrNot ')'
+	|	expressionName '.' typeArgumentsOrNot Identifier '(' argumentListOrNot ')'
+	|	primary '.' typeArgumentsOrNot Identifier '(' argumentListOrNot ')'
+	|	'super' '.' typeArgumentsOrNot Identifier '(' argumentListOrNot ')'
+	|	typeName '.' 'super' '.' typeArgumentsOrNot Identifier '(' argumentListOrNot ')'
 	;
 
 methodInvocation_lf_primary
-	:	'.' typeArguments? Identifier '(' argumentList? ')'
+	:	'.' typeArgumentsOrNot Identifier '(' argumentListOrNot ')'
 	;
 
 methodInvocation_lfno_primary
-	:	methodName '(' argumentList? ')'
-	|	typeName '.' typeArguments? Identifier '(' argumentList? ')'
-	|	expressionName '.' typeArguments? Identifier '(' argumentList? ')'
-	|	'super' '.' typeArguments? Identifier '(' argumentList? ')'
-	|	typeName '.' 'super' '.' typeArguments? Identifier '(' argumentList? ')'
+	:	methodName '(' argumentListOrNot ')'
+	|	typeName '.' typeArgumentsOrNot Identifier '(' argumentListOrNot ')'
+	|	expressionName '.' typeArgumentsOrNot Identifier '(' argumentListOrNot ')'
+	|	'super' '.' typeArgumentsOrNot Identifier '(' argumentListOrNot ')'
+	|	typeName '.' 'super' '.' typeArgumentsOrNot Identifier '(' argumentListOrNot ')'
 	;
 
 argumentList
 	:	expression (',' expression)*
 	;
 
+argumentListOrNot
+	:	argumentList?
+	;
+
 methodReference
-	:	expressionName '::' typeArguments? Identifier
-	|	referenceType '::' typeArguments? Identifier
-	|	primary '::' typeArguments? Identifier
-	|	'super' '::' typeArguments? Identifier
-	|	typeName '.' 'super' '::' typeArguments? Identifier
-	|	classType '::' typeArguments? 'new'
+	:	expressionName '::' typeArgumentsOrNot Identifier
+	|	referenceType '::' typeArgumentsOrNot Identifier
+	|	primary '::' typeArgumentsOrNot Identifier
+	|	'super' '::' typeArgumentsOrNot Identifier
+	|	typeName '.' 'super' '::' typeArgumentsOrNot Identifier
+	|	classType '::' typeArgumentsOrNot 'new'
 	|	arrayType '::' 'new'
 	;
 
 methodReference_lf_primary
-	:	'::' typeArguments? Identifier
+	:	'::' typeArgumentsOrNot Identifier
 	;
 
 methodReference_lfno_primary
-	:	expressionName '::' typeArguments? Identifier
-	|	referenceType '::' typeArguments? Identifier
-	|	'super' '::' typeArguments? Identifier
-	|	typeName '.' 'super' '::' typeArguments? Identifier
-	|	classType '::' typeArguments? 'new'
+	:	expressionName '::' typeArgumentsOrNot Identifier
+	|	referenceType '::' typeArgumentsOrNot Identifier
+	|	'super' '::' typeArgumentsOrNot Identifier
+	|	typeName '.' 'super' '::' typeArgumentsOrNot Identifier
+	|	classType '::' typeArgumentsOrNot 'new'
 	|	arrayType '::' 'new'
 	;
 
