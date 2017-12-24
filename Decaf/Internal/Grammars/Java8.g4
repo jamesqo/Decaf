@@ -446,8 +446,8 @@ methodModifier
 	;
 
 methodHeader
-	:	result methodDeclarator throws_?
-	|	typeParameters annotation* result methodDeclarator throws_?
+	:	result methodDeclarator throws_orNot
+	|	typeParameters annotation* result methodDeclarator throws_orNot
 	;
 
 result
@@ -492,6 +492,10 @@ throws_
 	:	'throws' exceptionTypeList
 	;
 
+throws_orNot
+	:	throws_?
+	;
+
 exceptionTypeList
 	:	exceptionType (',' exceptionType)*
 	;
@@ -515,7 +519,7 @@ staticInitializer
 	;
 
 constructorDeclaration
-	:	constructorModifier* constructorDeclarator throws_? constructorBody
+	:	constructorModifier* constructorDeclarator throws_orNot constructorBody
 	;
 
 constructorModifier
@@ -1136,8 +1140,16 @@ methodInvocation_lf_primary
 	;
 
 methodInvocation_lfno_primary
+	:	simpleMethodInvocation_lfno_primary
+	|	notSoSimpleMethodInvocation_lfno_primary
+	;
+
+simpleMethodInvocation_lfno_primary
 	:	methodName '(' argumentListOrNot ')'
-	|	typeName '.' typeArgumentsOrNot Identifier '(' argumentListOrNot ')'
+	;
+
+notSoSimpleMethodInvocation_lfno_primary
+	:	typeName '.' typeArgumentsOrNot Identifier '(' argumentListOrNot ')'
 	|	expressionName '.' typeArgumentsOrNot Identifier '(' argumentListOrNot ')'
 	|	'super' '.' typeArgumentsOrNot Identifier '(' argumentListOrNot ')'
 	|	typeName '.' 'super' '.' typeArgumentsOrNot Identifier '(' argumentListOrNot ')'

@@ -13,14 +13,27 @@ namespace CoffeeMachine.Internal
 {
     internal class DecafVisitor : Java8BaseVisitor<Unit>
     {
-        private readonly BrewOptions _options;
-        private StringBuilder _output;
+        private class State
+        {
+            public IToken CurrentToken { get; set; }
+            public StringBuilder Output { get; set; }
+            public int TokenIndex { get; set; }
 
+            public State Clone()
+            {
+                return new State
+                {
+                    CurrentToken = CurrentToken,
+                    Output = Output,
+                    TokenIndex = TokenIndex
+                };
+            }
+        }
+
+        private readonly BrewOptions _options;
         private readonly ITokenStream _tokenStream;
         private readonly IParseTree _tree;
-
-        private int _tokenIndex;
-        private IToken _currentToken;
+        private State _state;
 
         private readonly HashSet<string> _usings;
         private string _namespace;
@@ -28,72 +41,44 @@ namespace CoffeeMachine.Internal
         public DecafVisitor(BrewOptions options, ITokenStream tokenStream, IParseTree tree)
         {
             _options = options;
-            _output = new StringBuilder();
-            _usings = new HashSet<string>();
-
             _tokenStream = tokenStream;
             _tree = tree;
+            _state = new State
+            {
+                Output = new StringBuilder()
+            };
+
+            _usings = new HashSet<string>();
         }
 
         public string GenerateCSharp()
         {
             Visit(_tree);
             // TODO: Add usings and namespace, plus format the C#.
-            return _output.ToString();
+            return _state.Output.ToString();
         }
 
         #region Private helper methods
 
         private void AdvanceTokenIndex(int offset)
         {
-            _tokenIndex += offset;
-        }
-
-        private void AppendCSharp(string csharpText, int advanceTokenIndexBy = 1, bool processHiddenTokensBeforeCurrent = true)
-        {
-            if (processHiddenTokensBeforeCurrent)
-            {
-                ProcessHiddenTokensBeforeCurrent();
-            }
-
-            AppendCSharpNoAdvance(csharpText);
-            AdvanceTokenIndex(advanceTokenIndexBy);
-        }
-
-        private void AppendCSharp(string csharpText, IToken correspondingToken)
-        {
-            D.AssertNotNull(correspondingToken);
-
-            _currentToken = correspondingToken;
-            AppendCSharp(csharpText);
-        }
-
-        private void AppendCSharp(string csharpText, ITerminalNode node)
-        {
-            D.AssertNotNull(node);
-
-            AppendCSharp(csharpText, node.Symbol);
-        }
-
-        private void AppendCSharpNoAdvance(string csharpText)
-        {
-            _output.Append(csharpText);
+            _state.TokenIndex += offset;
         }
 
         private string CaptureOutput(Action action)
         {
-            var originalOutput = _output;
-            _output = new StringBuilder();
+            var originalState = _state.Clone();
+            _state.Output = new StringBuilder();
             action();
-            string result = _output.ToString();
-            _output = originalOutput;
+            string result = _state.Output.ToString();
+            _state = originalState;
             return result;
         }
 
         private void ProcessHiddenTokensBeforeCurrent()
         {
-            int start = _tokenIndex;
-            int end = _currentToken.TokenIndex;
+            int start = _state.TokenIndex;
+            int end = _state.CurrentToken.TokenIndex;
 
             for (int i = start; i < end; i++)
             {
@@ -103,7 +88,73 @@ namespace CoffeeMachine.Internal
 
         private void ProcessHiddenToken(IToken hiddenToken)
         {
-            AppendCSharp(hiddenToken.Text, processHiddenTokensBeforeCurrent: false);
+            Write(hiddenToken.Text, processHiddenTokensBeforeCurrent: false);
+        }
+
+        private void Write(string csharpText, int advanceTokenIndexBy = 1, bool processHiddenTokensBeforeCurrent = true)
+        {
+            if (processHiddenTokensBeforeCurrent)
+            {
+                ProcessHiddenTokensBeforeCurrent();
+            }
+
+            WriteNoAdvance(csharpText);
+            AdvanceTokenIndex(advanceTokenIndexBy);
+        }
+
+        private void Write(string csharpText, IToken correspondingToken)
+        {
+            D.AssertNotNull(correspondingToken);
+
+            _state.CurrentToken = correspondingToken;
+            Write(csharpText);
+        }
+
+        private void Write(string csharpText, ITerminalNode node)
+        {
+            D.AssertNotNull(node);
+
+            Write(csharpText, node.Symbol);
+        }
+
+        private void WriteNoAdvance(string csharpText)
+        {
+            _state.Output.Append(csharpText);
+        }
+
+        private bool WriteGetterProperty(
+            string javaMethodName,
+            ArgumentListContext argumentList,
+            TypeArgumentsContext typeArguments)
+        {
+            if (!ConvertGetterInvocation(javaMethodName, argumentList, typeArguments, out string csharpPropertyName))
+            {
+                return false;
+            }
+
+            ProcessHiddenTokensBeforeCurrent();
+            WriteNoAdvance(csharpPropertyName);
+            AdvanceTokenIndex(3); // Identifier '(' ')'
+            return true;
+        }
+
+        private bool WriteSetterProperty(
+            string javaMethodName,
+            ArgumentListContext argumentList,
+            TypeArgumentsContext typeArguments)
+        {
+            if (!ConvertSetterInvocation(javaMethodName, argumentList, typeArguments, out string csharpPropertyName))
+            {
+                return false;
+            }
+
+            ProcessHiddenTokensBeforeCurrent();
+            WriteNoAdvance(csharpPropertyName);
+            WriteNoAdvance("=");
+            AdvanceTokenIndex(2); // Identifier '('
+            Visit(argumentList);
+            AdvanceTokenIndex(1); // ')'
+            return true;
         }
 
         #endregion
@@ -112,51 +163,51 @@ namespace CoffeeMachine.Internal
 
         public override Unit VisitErrorNode(IErrorNode node)
         {
-            _currentToken = node.Symbol;
-            D.AssertNotNull(_currentToken);
+            _state.CurrentToken = node.Symbol;
+            D.AssertNotNull(_state.CurrentToken);
 
-            AppendCSharp(_currentToken.Text);
+            Write(_state.CurrentToken.Text);
             return default;
         }
 
         public override Unit VisitTerminal([NotNull] ITerminalNode node)
         {
-            _currentToken = node.Symbol;
-            D.AssertNotNull(_currentToken);
+            _state.CurrentToken = node.Symbol;
+            D.AssertNotNull(_state.CurrentToken);
 
             // Reference: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/_keywords.html
-            switch (_currentToken.Type)
+            switch (_state.CurrentToken.Type)
             {
                 case BOOLEAN:
-                    AppendCSharp("bool");
+                    Write("bool");
                     break;
                 case EXTENDS:
-                    AppendCSharp(":");
+                    Write(":");
                     break;
                 case FINAL:
-                    AppendCSharp("readonly");
+                    Write("readonly");
                     break;
                 case IMPLEMENTS:
-                    AppendCSharp(":");
+                    Write(":");
                     break;
                 // TODO: import
                 case INSTANCEOF:
-                    AppendCSharp("is");
+                    Write("is");
                     break;
                 case NATIVE:
-                    AppendCSharp("extern");
+                    Write("extern");
                     break;
                 // TODO: package
                 case SUPER:
-                    AppendCSharp("base");
+                    Write("base");
                     break;
                 case SYNCHRONIZED:
-                    AppendCSharp("lock");
+                    Write("lock");
                     break;
                 // TODO: throws
                 // TODO: transient
                 default:
-                    AppendCSharp(_currentToken.Text);
+                    Write(_state.CurrentToken.Text);
                     break;
             }
             return default;
@@ -165,54 +216,51 @@ namespace CoffeeMachine.Internal
         public override Unit VisitAssertStatementNoMessage([NotNull] AssertStatementNoMessageContext context)
         {
             // 'assert' expression ';'
-            AppendCSharp("Debug.Assert(", context.GetChild<ITerminalNode>(0));
+            Write("Debug.Assert(", (ITerminalNode)context.GetChild(0));
             Visit(context.expression());
-            AppendCSharp(");", context.GetChild<ITerminalNode>(2));
+            Write(");", (ITerminalNode)context.GetChild(2));
             return default;
         }
 
         public override Unit VisitAssertStatementWithMessage([NotNull] AssertStatementWithMessageContext context)
         {
             // 'assert' expression ':' expression ';'
-            AppendCSharp("Debug.Assert(", context.GetChild<ITerminalNode>(0));
+            Write("Debug.Assert(", (ITerminalNode)context.GetChild(0));
             Visit(context.GetChild(1));
-            AppendCSharp(",", context.GetChild<ITerminalNode>(2));
+            Write(",", (ITerminalNode)context.GetChild(2));
             Visit(context.GetChild(3));
-            AppendCSharp(");", context.GetChild<ITerminalNode>(4));
+            Write(");", (ITerminalNode)context.GetChild(4));
             return default;
         }
 
         public override Unit VisitSimpleMethodInvocation([NotNull] SimpleMethodInvocationContext context)
         {
+            return CommonVisitSimpleMethodInvocation(context);
+        }
+
+        public override Unit VisitSimpleMethodInvocation_lfno_primary([NotNull] SimpleMethodInvocation_lfno_primaryContext context)
+        {
+            return CommonVisitSimpleMethodInvocation(context);
+        }
+
+        private Unit CommonVisitSimpleMethodInvocation(ParserRuleContext context)
+        {
             // methodName '(' argumentListOrNot ')'
             // methodName : Identifier
             // argumentListOrNot : argumentList?
-            var methodNameNode = context.methodName().Identifier();
+            var methodNameNode = context.GetFirstChild<MethodNameContext>().Identifier();
             string methodName = methodNameNode.GetText();
-            var argumentListOrNot = context.argumentListOrNot();
+            var argumentListOrNot = context.GetFirstChild<ArgumentListOrNotContext>();
             var argumentList = argumentListOrNot.argumentList();
 
-            if (ConvertGetterInvocation(methodName, argumentList, null, out string getterPropertyName))
+            if (WriteGetterProperty(methodName, argumentList, null) ||
+                WriteSetterProperty(methodName, argumentList, null))
             {
-                ProcessHiddenTokensBeforeCurrent();
-                AppendCSharpNoAdvance(getterPropertyName);
-                AdvanceTokenIndex(3); // methodName '(' ')'
-                return default;
-            }
-
-            if (ConvertSetterInvocation(methodName, argumentList, null, out string setterPropertyName))
-            {
-                ProcessHiddenTokensBeforeCurrent();
-                AppendCSharpNoAdvance(setterPropertyName);
-                AppendCSharpNoAdvance("=");
-                AdvanceTokenIndex(2); // methodName '('
-                Visit(argumentList);
-                AdvanceTokenIndex(1); // ')'
                 return default;
             }
 
             string csharpMethodName = ConvertToCamelCase(methodName);
-            AppendCSharp(csharpMethodName, methodNameNode);
+            Write(csharpMethodName, methodNameNode);
             Visit(context.GetChild(1));
             Visit(argumentListOrNot);
             Visit(context.GetChild(3));
@@ -221,60 +269,43 @@ namespace CoffeeMachine.Internal
 
         public override Unit VisitNotSoSimpleMethodInvocation([NotNull] NotSoSimpleMethodInvocationContext context)
         {
-            /*
-             notSoSimpleMethodInvocation
-                :   typeName '.' typeArgumentsOrNot Identifier '(' argumentListOrNot ')'
-                |   expressionName '.' typeArgumentsOrNot Identifier '(' argumentListOrNot ')'
-                |   primary '.' typeArgumentsOrNot Identifier '(' argumentListOrNot ')'
-                |   'super' '.' typeArgumentsOrNot Identifier '(' argumentListOrNot ')'
-                |   typeName '.' 'super' '.' typeArgumentsOrNot Identifier '(' argumentListOrNot ')'
-    ;           ;
-             */
+            return CommonVisitNotSoSimpleMethodInvocation(context);
+        }
 
-            string methodName = context.Identifier().GetText();
-            var typeArgumentsOrNot = context.typeArgumentsOrNot();
+        public override Unit VisitMethodInvocation_lf_primary([NotNull] MethodInvocation_lf_primaryContext context)
+        {
+            return CommonVisitNotSoSimpleMethodInvocation(context);
+        }
+
+        public override Unit VisitNotSoSimpleMethodInvocation_lfno_primary([NotNull] NotSoSimpleMethodInvocation_lfno_primaryContext context)
+        {
+            return CommonVisitNotSoSimpleMethodInvocation(context);
+        }
+
+        private Unit CommonVisitNotSoSimpleMethodInvocation(ParserRuleContext context)
+        {
+            string methodName = context.GetFirstToken(Identifier).GetText();
+            var typeArgumentsOrNot = context.GetFirstChild<TypeArgumentsOrNotContext>();
             var typeArgumentsNode = typeArgumentsOrNot.typeArguments();
-            var argumentListOrNot = context.argumentListOrNot();
+            var argumentListOrNot = context.GetFirstChild<ArgumentListOrNotContext>();
             var argumentList = argumentListOrNot.argumentList();
+
+            this.VisitChildrenBefore(typeArgumentsOrNot, context);
+
+            if (WriteGetterProperty(methodName, argumentList, typeArgumentsNode) ||
+                WriteSetterProperty(methodName, argumentList, typeArgumentsNode))
+            {
+                return default;
+            }
+
             var lparen = context.GetFirstToken(LPAREN);
             var rparen = context.GetFirstToken(RPAREN);
-
-            for (int i = 0; ; i++)
-            {
-                var child = context.GetChild(i);
-                if (child == typeArgumentsOrNot)
-                {
-                    break;
-                }
-
-                Visit(child);
-            }
-
-            if (ConvertGetterInvocation(methodName, argumentList, typeArgumentsNode, out string getterPropertyName))
-            {
-                ProcessHiddenTokensBeforeCurrent();
-                AppendCSharpNoAdvance(getterPropertyName);
-                AdvanceTokenIndex(3); // Identifier '(' ')'
-                return default;
-            }
-
-            if (ConvertSetterInvocation(methodName, argumentList, typeArgumentsNode, out string setterPropertyName))
-            {
-                ProcessHiddenTokensBeforeCurrent();
-                AppendCSharpNoAdvance(setterPropertyName);
-                AppendCSharpNoAdvance("=");
-                AdvanceTokenIndex(2); // Identifier '('
-                Visit(argumentList);
-                AdvanceTokenIndex(1); // ')'
-                return default;
-            }
-
             string typeArguments = CaptureOutput(() => Visit(typeArgumentsOrNot));
 
             string csharpMethodName = ConvertToCamelCase(methodName);
-            AppendCSharpNoAdvance(csharpMethodName);
-            AppendCSharpNoAdvance(typeArguments);
-            AdvanceTokenIndex(typeArgumentsOrNot.GetDescendantTokenCount() + 1); // typeArgumentsOrNot Identifier
+            WriteNoAdvance(csharpMethodName);
+            WriteNoAdvance(typeArguments);
+            AdvanceTokenIndex(typeArgumentsOrNot.DescendantTokenCount() + 1); // typeArgumentsOrNot Identifier
             Visit(lparen);
             Visit(argumentListOrNot);
             Visit(rparen);
