@@ -100,6 +100,8 @@ namespace CoffeeMachine.Internal
             Write(hiddenToken.Text, processHiddenTokensBeforeCurrent: false);
         }
 
+        private void SetNamespace(string @namespace) => _namespace = @namespace;
+
         private void Write(string csharpText, int advanceTokenIndexBy = 1, bool processHiddenTokensBeforeCurrent = true)
         {
             if (processHiddenTokensBeforeCurrent)
@@ -205,14 +207,15 @@ namespace CoffeeMachine.Internal
                 case NATIVE:
                     Write("extern");
                     break;
-                // TODO: package
                 case SUPER:
                     Write("base");
                     break;
                 case SYNCHRONIZED:
                     Write("lock");
                     break;
-                // TODO: transient
+                case TRANSIENT:
+                    // Don't write anything.
+                    break;
                 default:
                     Write(_state.CurrentToken.Text);
                     break;
@@ -366,6 +369,22 @@ namespace CoffeeMachine.Internal
             Visit(lparen);
             Visit(argumentListOrNot);
             Visit(rparen);
+            return default;
+        }
+
+        #endregion
+
+        #region Package declarations
+
+        public override Unit VisitPackageDeclaration([NotNull] PackageDeclarationContext context)
+        {
+            // packageModifier* 'package' packageName ';'
+            var packageNameNode = context.packageName();
+            string packageName = packageNameNode.GetText();
+
+            string csharpNamespaceName = ConvertPackageName(packageName);
+            SetNamespace(csharpNamespaceName);
+            AdvanceTokenIndex(context.DescendantTokenCount());
             return default;
         }
 
