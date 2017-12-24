@@ -36,6 +36,7 @@ namespace CoffeeMachine.Internal
         private State _state;
 
         private readonly HashSet<string> _usings;
+        private readonly HashSet<string> _usingStatics;
         private string _namespace;
 
         public DecafVisitor(BrewOptions options, ITokenStream tokenStream, IParseTree tree)
@@ -49,16 +50,24 @@ namespace CoffeeMachine.Internal
             };
 
             _usings = new HashSet<string>();
+            _usingStatics = new HashSet<string>();
+            _namespace = string.Empty;
         }
 
         public string GenerateCSharp()
         {
             Visit(_tree);
-            // TODO: Add usings and namespace, plus format the C#.
-            return _state.Output.ToString();
+            return CSharpFormatter.Format(
+                csharpCode: _state.Output.ToString(),
+                withUsings: _usings,
+                withUsingStatics: _usingStatics,
+                withNamespace: _namespace,
+                options: _options);
         }
 
         #region Private helper methods
+
+        private bool AddUsing(string @namespace) => _usings.Add(@namespace);
 
         private void AdvanceTokenIndex(int offset)
         {
@@ -204,7 +213,6 @@ namespace CoffeeMachine.Internal
                 case SYNCHRONIZED:
                     Write("lock");
                     break;
-                // TODO: throws
                 // TODO: transient
                 default:
                     Write(_state.CurrentToken.Text);
@@ -216,6 +224,7 @@ namespace CoffeeMachine.Internal
         public override Unit VisitAssertStatementNoMessage([NotNull] AssertStatementNoMessageContext context)
         {
             // 'assert' expression ';'
+            AddUsing("System.Diagnostics");
             Write("Debug.Assert(", (ITerminalNode)context.GetChild(0));
             Visit(context.expression());
             Write(");", (ITerminalNode)context.GetChild(2));
@@ -225,6 +234,7 @@ namespace CoffeeMachine.Internal
         public override Unit VisitAssertStatementWithMessage([NotNull] AssertStatementWithMessageContext context)
         {
             // 'assert' expression ':' expression ';'
+            AddUsing("System.Diagnostics");
             Write("Debug.Assert(", (ITerminalNode)context.GetChild(0));
             Visit(context.GetChild(1));
             Write(",", (ITerminalNode)context.GetChild(2));

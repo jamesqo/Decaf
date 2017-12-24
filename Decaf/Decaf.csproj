@@ -24,6 +24,9 @@
     <Compile Update="Internal\ConversionHelpers.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Internal\CSharpFormatter.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Internal\Diagnostics\D.cs">
       <SubType>Code</SubType>
     </Compile>
