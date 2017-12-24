@@ -84,10 +84,15 @@ namespace CoffeeMachine.Internal
             return result;
         }
 
-        private void ProcessHiddenTokensBeforeCurrent()
+        private void ProcessHiddenToken(IToken hiddenToken)
+        {
+            Write(hiddenToken.Text);
+        }
+
+        private void ProcessHiddenTokensBefore(IToken currentToken)
         {
             int start = _state.TokenIndex;
-            int end = _state.CurrentToken.TokenIndex;
+            int end = currentToken.TokenIndex;
 
             for (int i = start; i < end; i++)
             {
@@ -95,37 +100,30 @@ namespace CoffeeMachine.Internal
             }
         }
 
-        private void ProcessHiddenToken(IToken hiddenToken)
-        {
-            Write(hiddenToken.Text, processHiddenTokensBeforeCurrent: false);
-        }
+        private void ProcessHiddenTokensBefore(ITerminalNode currentNode)
+            => ProcessHiddenTokensBefore(currentNode.Symbol);
+
+        private void ProcessHiddenTokensBefore(ParserRuleContext currentContext)
+            => ProcessHiddenTokensBefore(currentContext.GetFirstToken());
 
         private void SetNamespace(string @namespace) => _namespace = @namespace;
 
-        private void Write(string csharpText, int advanceTokenIndexBy = 1, bool processHiddenTokensBeforeCurrent = true)
+        private void Write(string csharpText, IToken currentToken = null)
         {
-            if (processHiddenTokensBeforeCurrent)
+            if (currentToken != null)
             {
-                ProcessHiddenTokensBeforeCurrent();
+                ProcessHiddenTokensBefore(currentToken);
             }
 
             WriteNoAdvance(csharpText);
-            AdvanceTokenIndex(advanceTokenIndexBy);
+            AdvanceTokenIndex(1);
         }
 
-        private void Write(string csharpText, IToken correspondingToken)
+        private void Write(string csharpText, ITerminalNode currentNode)
         {
-            D.AssertNotNull(correspondingToken);
+            D.AssertNotNull(currentNode);
 
-            _state.CurrentToken = correspondingToken;
-            Write(csharpText);
-        }
-
-        private void Write(string csharpText, ITerminalNode node)
-        {
-            D.AssertNotNull(node);
-
-            Write(csharpText, node.Symbol);
+            Write(csharpText, currentNode.Symbol);
         }
 
         private void WriteNoAdvance(string csharpText)
@@ -143,7 +141,6 @@ namespace CoffeeMachine.Internal
                 return false;
             }
 
-            ProcessHiddenTokensBeforeCurrent();
             WriteNoAdvance(csharpPropertyName);
             AdvanceTokenIndex(3); // Identifier '(' ')'
             return true;
@@ -159,7 +156,6 @@ namespace CoffeeMachine.Internal
                 return false;
             }
 
-            ProcessHiddenTokensBeforeCurrent();
             WriteNoAdvance(csharpPropertyName);
             WriteNoAdvance("=");
             AdvanceTokenIndex(2); // Identifier '('
@@ -174,8 +170,7 @@ namespace CoffeeMachine.Internal
 
         public override Unit VisitErrorNode(IErrorNode node)
         {
-            _state.CurrentToken = node.Symbol;
-            D.AssertNotNull(_state.CurrentToken);
+            ProcessHiddenTokensBefore(node);
 
             Write(_state.CurrentToken.Text);
             return default;
@@ -183,8 +178,7 @@ namespace CoffeeMachine.Internal
 
         public override Unit VisitTerminal([NotNull] ITerminalNode node)
         {
-            _state.CurrentToken = node.Symbol;
-            D.AssertNotNull(_state.CurrentToken);
+            ProcessHiddenTokensBefore(node);
 
             // Reference: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/_keywords.html
             switch (_state.CurrentToken.Type)
@@ -227,6 +221,8 @@ namespace CoffeeMachine.Internal
 
         public override Unit VisitAssertStatementNoMessage([NotNull] AssertStatementNoMessageContext context)
         {
+            ProcessHiddenTokensBefore(context);
+
             // 'assert' expression ';'
             AddUsing("System.Diagnostics");
             Write("Debug.Assert(", (ITerminalNode)context.GetChild(0));
@@ -237,6 +233,8 @@ namespace CoffeeMachine.Internal
 
         public override Unit VisitAssertStatementWithMessage([NotNull] AssertStatementWithMessageContext context)
         {
+            ProcessHiddenTokensBefore(context);
+
             // 'assert' expression ':' expression ';'
             AddUsing("System.Diagnostics");
             Write("Debug.Assert(", (ITerminalNode)context.GetChild(0));
@@ -253,6 +251,8 @@ namespace CoffeeMachine.Internal
 
         public override Unit VisitSingleTypeImportDeclaration([NotNull] SingleTypeImportDeclarationContext context)
         {
+            ProcessHiddenTokensBefore(context);
+
             // 'import' typeName ';'
             var typeNameNode = context.typeName();
             string typeName = typeNameNode.GetText();
@@ -260,12 +260,15 @@ namespace CoffeeMachine.Internal
 
             string csharpNamespaceName = ConvertPackageName(packageName);
             AddUsing(csharpNamespaceName);
+
             AdvanceTokenIndex(context.DescendantTokenCount());
             return default;
         }
 
         public override Unit VisitTypeImportOnDemandDeclaration([NotNull] TypeImportOnDemandDeclarationContext context)
         {
+            ProcessHiddenTokensBefore(context);
+
             // 'import' packageOrTypeName '.' '*' ';'
             // We can't detect whether the packageOrTypeName node refers to a package or a type,
             // so just assume it's referring to a package.
@@ -274,6 +277,7 @@ namespace CoffeeMachine.Internal
 
             string csharpNamespaceName = ConvertPackageName(packageName);
             AddUsing(csharpNamespaceName);
+
             AdvanceTokenIndex(context.DescendantTokenCount());
             return default;
         }
@@ -284,6 +288,8 @@ namespace CoffeeMachine.Internal
 
         public override Unit VisitThrows_OrNot([NotNull] Throws_OrNotContext context)
         {
+            ProcessHiddenTokensBefore(context);
+
             // Exclude checked exceptions from the C# output.
             AdvanceTokenIndex(context.DescendantTokenCount());
             return default;
@@ -305,6 +311,8 @@ namespace CoffeeMachine.Internal
 
         private Unit CommonVisitSimpleMethodInvocation(ParserRuleContext context)
         {
+            ProcessHiddenTokensBefore(context);
+
             // methodName '(' argumentListOrNot ')'
             // methodName : Identifier
             // argumentListOrNot : argumentList?
@@ -320,6 +328,7 @@ namespace CoffeeMachine.Internal
             }
 
             string csharpMethodName = ConvertMethodName(methodName);
+
             Write(csharpMethodName, methodNameNode);
             Visit(context.GetChild(1));
             Visit(argumentListOrNot);
@@ -344,6 +353,8 @@ namespace CoffeeMachine.Internal
 
         private Unit CommonVisitNotSoSimpleMethodInvocation(ParserRuleContext context)
         {
+            ProcessHiddenTokensBefore(context);
+
             string methodName = context.GetFirstToken(Identifier).GetText();
             var typeArgumentsOrNot = context.GetFirstChild<TypeArgumentsOrNotContext>();
             var typeArgumentsNode = typeArgumentsOrNot.typeArguments();
@@ -361,8 +372,8 @@ namespace CoffeeMachine.Internal
             var lparen = context.GetFirstToken(LPAREN);
             var rparen = context.GetFirstToken(RPAREN);
             string typeArguments = CaptureOutput(() => Visit(typeArgumentsOrNot));
-
             string csharpMethodName = ConvertMethodName(methodName);
+
             WriteNoAdvance(csharpMethodName);
             WriteNoAdvance(typeArguments);
             AdvanceTokenIndex(typeArgumentsOrNot.DescendantTokenCount() + 1); // typeArgumentsOrNot Identifier
@@ -378,12 +389,15 @@ namespace CoffeeMachine.Internal
 
         public override Unit VisitPackageDeclaration([NotNull] PackageDeclarationContext context)
         {
+            ProcessHiddenTokensBefore(context);
+
             // packageModifier* 'package' packageName ';'
             var packageNameNode = context.packageName();
             string packageName = packageNameNode.GetText();
 
             string csharpNamespaceName = ConvertPackageName(packageName);
             SetNamespace(csharpNamespaceName);
+
             AdvanceTokenIndex(context.DescendantTokenCount());
             return default;
         }

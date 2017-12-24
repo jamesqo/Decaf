@@ -18,8 +18,7 @@ namespace CoffeeMachine.Internal
             string withNamespace,
             BrewOptions options)
         {
-            // TODO: Pass in CSharpParseOptions, with values based on BrewOptions.
-            var tree = CSharpSyntaxTree.ParseText(csharpCode);
+            var tree = CSharpSyntaxTree.ParseText(csharpCode, options.GetCSharpParseOptions());
             var root = tree.GetCompilationUnitRoot(options.CancellationToken);
             root = AddUsings(root, withUsings, withUsingStatics);
             root = AddNamespace(root, withNamespace);

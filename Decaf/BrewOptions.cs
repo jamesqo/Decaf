@@ -13,5 +13,10 @@ namespace CoffeeMachine
         public int SpacesPerIndent { get; set; } = 4;
         public bool TranslateCollectionTypes { get; set; } = true;
         public bool UseVarInDeclarations { get; set; } = true;
+
+        internal CSharpParseOptions GetCSharpParseOptions()
+        {
+            return new CSharpParseOptions(CSharpLanguageVersion);
+        }
     }
 }

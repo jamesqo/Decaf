@@ -38,12 +38,26 @@ namespace CoffeeMachine.Internal.Grammars
             return default;
         }
 
-        public static ITerminalNode GetFirstToken(this ParserRuleContext context, int tokenType)
+        public static ITerminalNode GetFirstToken(this IParseTree tree)
         {
-            int childCount = context.ChildCount;
+            int childCount = tree.ChildCount;
             for (int i = 0; i < childCount; i++)
             {
-                if (context.GetChild(i) is ITerminalNode terminal &&
+                if (tree.GetChild(i) is ITerminalNode terminal)
+                {
+                    return terminal;
+                }
+            }
+
+            return null;
+        }
+
+        public static ITerminalNode GetFirstToken(this IParseTree tree, int tokenType)
+        {
+            int childCount = tree.ChildCount;
+            for (int i = 0; i < childCount; i++)
+            {
+                if (tree.GetChild(i) is ITerminalNode terminal &&
                     terminal.Symbol?.Type == tokenType)
                 {
                     return terminal;
