@@ -15,7 +15,6 @@ namespace CoffeeMachine.Internal
     {
         private class RewindableState
         {
-            public IToken CurrentToken { get; set; }
             public StringBuilder Output { get; set; }
             public int TokenIndex { get; set; }
 
@@ -23,7 +22,6 @@ namespace CoffeeMachine.Internal
             {
                 return new RewindableState
                 {
-                    CurrentToken = CurrentToken,
                     Output = Output,
                     TokenIndex = TokenIndex
                 };
@@ -91,6 +89,8 @@ namespace CoffeeMachine.Internal
 
         private void ProcessHiddenTokensBefore(IToken currentToken)
         {
+            D.AssertNotNull(currentToken);
+
             int start = _state.TokenIndex;
             int end = currentToken.TokenIndex;
 
@@ -101,10 +101,22 @@ namespace CoffeeMachine.Internal
         }
 
         private void ProcessHiddenTokensBefore(ITerminalNode currentNode)
-            => ProcessHiddenTokensBefore(currentNode.Symbol);
+        {
+            D.AssertNotNull(currentNode);
+
+            ProcessHiddenTokensBefore(currentNode.Symbol);
+        }
 
         private void ProcessHiddenTokensBefore(ParserRuleContext currentContext)
-            => ProcessHiddenTokensBefore(currentContext.GetFirstToken());
+        {
+            D.AssertNotNull(currentContext);
+
+            ITerminalNode node = currentContext.GetLeadingToken();
+            if (node != null)
+            {
+                ProcessHiddenTokensBefore(node);
+            }
+        }
 
         private void SetNamespace(string @namespace) => _namespace = @namespace;
 
@@ -170,18 +182,20 @@ namespace CoffeeMachine.Internal
 
         public override Unit VisitErrorNode(IErrorNode node)
         {
-            ProcessHiddenTokensBefore(node);
+            var token = node.Symbol;
+            ProcessHiddenTokensBefore(token);
 
-            Write(_state.CurrentToken.Text);
+            Write(token.Text);
             return default;
         }
 
         public override Unit VisitTerminal([NotNull] ITerminalNode node)
         {
-            ProcessHiddenTokensBefore(node);
+            var token = node.Symbol;
+            ProcessHiddenTokensBefore(token);
 
             // Reference: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/_keywords.html
-            switch (_state.CurrentToken.Type)
+            switch (token.Type)
             {
                 case BOOLEAN:
                     Write("bool");
@@ -211,7 +225,7 @@ namespace CoffeeMachine.Internal
                     // Don't write anything.
                     break;
                 default:
-                    Write(_state.CurrentToken.Text);
+                    Write(token.Text);
                     break;
             }
             return default;

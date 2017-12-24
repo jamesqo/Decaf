@@ -38,20 +38,6 @@ namespace CoffeeMachine.Internal.Grammars
             return default;
         }
 
-        public static ITerminalNode GetFirstToken(this IParseTree tree)
-        {
-            int childCount = tree.ChildCount;
-            for (int i = 0; i < childCount; i++)
-            {
-                if (tree.GetChild(i) is ITerminalNode terminal)
-                {
-                    return terminal;
-                }
-            }
-
-            return null;
-        }
-
         public static ITerminalNode GetFirstToken(this IParseTree tree, int tokenType)
         {
             int childCount = tree.ChildCount;
@@ -65,6 +51,16 @@ namespace CoffeeMachine.Internal.Grammars
             }
 
             return null;
+        }
+
+        public static ITerminalNode GetLeadingToken(this IParseTree tree)
+        {
+            if (tree is ITerminalNode terminal)
+            {
+                return terminal;
+            }
+
+            return tree.GetChild(0)?.GetLeadingToken();
         }
 
         public static void VisitChildrenBefore(this AbstractParseTreeVisitor<Unit> visitor, IParseTree stop, IParseTree parent)
