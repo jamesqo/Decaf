@@ -446,8 +446,8 @@ methodModifier
 	;
 
 methodHeader
-	:	result methodDeclarator throws_orNot
-	|	typeParameters annotation* result methodDeclarator throws_orNot
+	:	result methodDeclarator throws_OrNot
+	|	typeParameters annotation* result methodDeclarator throws_OrNot
 	;
 
 result
@@ -492,7 +492,7 @@ throws_
 	:	'throws' exceptionTypeList
 	;
 
-throws_orNot
+throws_OrNot
 	:	throws_?
 	;
 
@@ -519,7 +519,7 @@ staticInitializer
 	;
 
 constructorDeclaration
-	:	constructorModifier* constructorDeclarator throws_orNot constructorBody
+	:	constructorModifier* constructorDeclarator throws_OrNot constructorBody
 	;
 
 constructorModifier

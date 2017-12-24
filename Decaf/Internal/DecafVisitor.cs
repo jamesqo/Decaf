@@ -312,6 +312,13 @@ namespace CoffeeMachine.Internal
             return default;
         }
 
+        public override Unit VisitThrows_OrNot([NotNull] Throws_OrNotContext context)
+        {
+            // Exclude checked exceptions from the C# output.
+            AdvanceTokenIndex(context.DescendantTokenCount());
+            return default;
+        }
+
         #endregion
     }
 }
