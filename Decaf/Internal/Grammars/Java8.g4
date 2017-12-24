@@ -471,7 +471,16 @@ formalParameters
 	;
 
 formalParameter
-	:	variableModifier* unannType variableDeclaratorId
+	:	parameterModifier* unannType variableDeclaratorId
+	;
+
+parameterModifier
+	:	annotation
+	|	parameterFinalModifier
+	;
+
+parameterFinalModifier
+	:	'final'
 	;
 
 variableModifier
@@ -480,7 +489,7 @@ variableModifier
 	;
 
 lastFormalParameter
-	:	variableModifier* unannType annotation* '...' variableDeclaratorId
+	:	parameterModifier* unannType annotation* '...' variableDeclaratorId
 	|	formalParameter
 	;
 
@@ -740,7 +749,16 @@ localVariableDeclarationStatement
 	;
 
 localVariableDeclaration
-	:	variableModifier* unannType variableDeclaratorList
+	:	localVariableModifier* unannType variableDeclaratorList
+	;
+
+localVariableModifier
+	:	annotation
+	|	localVariableFinalModifier
+	;
+
+localVariableFinalModifier
+	:	'final'
 	;
 
 statement

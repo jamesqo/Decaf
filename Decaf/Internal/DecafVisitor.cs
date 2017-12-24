@@ -6,6 +6,7 @@ using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
 using CoffeeMachine.Internal.Diagnostics;
 using CoffeeMachine.Internal.Grammars;
+using Microsoft.CodeAnalysis.CSharp;
 using static CoffeeMachine.Internal.ConversionHelpers;
 using static CoffeeMachine.Internal.Grammars.Java8Parser;
 
@@ -131,39 +132,6 @@ namespace CoffeeMachine.Internal
             _state.Output.Append(csharpText);
         }
 
-        private bool WriteGetterProperty(
-            string javaMethodName,
-            ArgumentListContext argumentList,
-            TypeArgumentsContext typeArguments)
-        {
-            if (!ConvertGetterInvocation(javaMethodName, argumentList, typeArguments, out string csharpPropertyName))
-            {
-                return false;
-            }
-
-            WriteNoAdvance(csharpPropertyName);
-            AdvanceTokenIndex(3); // Identifier '(' ')'
-            return true;
-        }
-
-        private bool WriteSetterProperty(
-            string javaMethodName,
-            ArgumentListContext argumentList,
-            TypeArgumentsContext typeArguments)
-        {
-            if (!ConvertSetterInvocation(javaMethodName, argumentList, typeArguments, out string csharpPropertyName))
-            {
-                return false;
-            }
-
-            WriteNoAdvance(csharpPropertyName);
-            WriteNoAdvance("=");
-            AdvanceTokenIndex(2); // Identifier '('
-            Visit(argumentList);
-            AdvanceTokenIndex(1); // ')'
-            return true;
-        }
-
         #endregion
 
         #region Visit methods
@@ -286,12 +254,42 @@ namespace CoffeeMachine.Internal
 
         #endregion
 
+        #region Local variables
+
+        public override Unit VisitLocalVariableFinalModifier([NotNull] LocalVariableFinalModifierContext context)
+        {
+            ProcessHiddenTokensBefore(context);
+
+            // localVariableFinalModifier : 'final'
+            // 'final Foo local' => 'Foo local' (C# does not yet have readonly locals)
+            AdvanceTokenIndex(context.DescendantTokenCount());
+            return default;
+        }
+
+        #endregion
+
         #region Method declarations
+
+        public override Unit VisitParameterFinalModifier([NotNull] ParameterFinalModifierContext context)
+        {
+            ProcessHiddenTokensBefore(context);
+
+            // parameterFinalModifier : 'final'
+            // 'final Foo parameter' => 'in Foo parameter' for C# >= 7.2, 'Foo parameter' otherwise
+            if (_options.CSharpLanguageVersion >= LanguageVersion.CSharp7_2)
+            {
+                WriteNoAdvance("in ");
+            }
+
+            AdvanceTokenIndex(context.DescendantTokenCount());
+            return default;
+        }
 
         public override Unit VisitThrows_OrNot([NotNull] Throws_OrNotContext context)
         {
             ProcessHiddenTokensBefore(context);
 
+            // throws_OrNot : throws_?
             // Exclude checked exceptions from the C# output.
             AdvanceTokenIndex(context.DescendantTokenCount());
             return default;
@@ -383,6 +381,39 @@ namespace CoffeeMachine.Internal
             Visit(argumentListOrNot);
             Visit(rparen);
             return default;
+        }
+
+        private bool WriteGetterProperty(
+            string javaMethodName,
+            ArgumentListContext argumentList,
+            TypeArgumentsContext typeArguments)
+        {
+            if (!ConvertGetterInvocation(javaMethodName, argumentList, typeArguments, out string csharpPropertyName))
+            {
+                return false;
+            }
+
+            WriteNoAdvance(csharpPropertyName);
+            AdvanceTokenIndex(3); // Identifier '(' ')'
+            return true;
+        }
+
+        private bool WriteSetterProperty(
+            string javaMethodName,
+            ArgumentListContext argumentList,
+            TypeArgumentsContext typeArguments)
+        {
+            if (!ConvertSetterInvocation(javaMethodName, argumentList, typeArguments, out string csharpPropertyName))
+            {
+                return false;
+            }
+
+            WriteNoAdvance(csharpPropertyName);
+            WriteNoAdvance("=");
+            AdvanceTokenIndex(2); // Identifier '('
+            Visit(argumentList);
+            AdvanceTokenIndex(1); // ')'
+            return true;
         }
 
         #endregion
