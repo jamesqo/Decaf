@@ -13,15 +13,15 @@ namespace CoffeeMachine.Internal
 {
     internal class DecafVisitor : Java8BaseVisitor<Unit>
     {
-        private class State
+        private class RewindableState
         {
             public IToken CurrentToken { get; set; }
             public StringBuilder Output { get; set; }
             public int TokenIndex { get; set; }
 
-            public State Clone()
+            public RewindableState Clone()
             {
-                return new State
+                return new RewindableState
                 {
                     CurrentToken = CurrentToken,
                     Output = Output,
@@ -33,7 +33,7 @@ namespace CoffeeMachine.Internal
         private readonly BrewOptions _options;
         private readonly ITokenStream _tokenStream;
         private readonly IParseTree _tree;
-        private State _state;
+        private RewindableState _state;
 
         private readonly HashSet<string> _usings;
         private readonly HashSet<string> _usingStatics;
@@ -44,7 +44,7 @@ namespace CoffeeMachine.Internal
             _options = options;
             _tokenStream = tokenStream;
             _tree = tree;
-            _state = new State
+            _state = new RewindableState
             {
                 Output = new StringBuilder()
             };
@@ -269,7 +269,7 @@ namespace CoffeeMachine.Internal
                 return default;
             }
 
-            string csharpMethodName = ConvertToCamelCase(methodName);
+            string csharpMethodName = ConvertMethodName(methodName);
             Write(csharpMethodName, methodNameNode);
             Visit(context.GetChild(1));
             Visit(argumentListOrNot);
@@ -312,7 +312,7 @@ namespace CoffeeMachine.Internal
             var rparen = context.GetFirstToken(RPAREN);
             string typeArguments = CaptureOutput(() => Visit(typeArgumentsOrNot));
 
-            string csharpMethodName = ConvertToCamelCase(methodName);
+            string csharpMethodName = ConvertMethodName(methodName);
             WriteNoAdvance(csharpMethodName);
             WriteNoAdvance(typeArguments);
             AdvanceTokenIndex(typeArgumentsOrNot.DescendantTokenCount() + 1); // typeArgumentsOrNot Identifier
