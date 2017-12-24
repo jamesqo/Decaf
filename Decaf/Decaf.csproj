@@ -27,6 +27,9 @@
     <Compile Update="Internal\Diagnostics\D.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Internal\Grammars\AntlrHelpers.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Internal\Grammars\Java8GrammarHelpers.cs">
       <SubType>Code</SubType>
     </Compile>

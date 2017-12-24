@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
@@ -13,7 +14,7 @@ namespace CoffeeMachine.Internal
     internal class DecafVisitor : Java8BaseVisitor<Unit>
     {
         private readonly BrewOptions _options;
-        private readonly ITextWriter _csharp;
+        private StringBuilder _output;
 
         private readonly ITokenStream _tokenStream;
         private readonly IParseTree _tree;
@@ -27,7 +28,7 @@ namespace CoffeeMachine.Internal
         public DecafVisitor(BrewOptions options, ITokenStream tokenStream, IParseTree tree)
         {
             _options = options;
-            _csharp = new StringBuilder();
+            _output = new StringBuilder();
             _usings = new HashSet<string>();
 
             _tokenStream = tokenStream;
@@ -38,17 +39,14 @@ namespace CoffeeMachine.Internal
         {
             Visit(_tree);
             // TODO: Add usings and namespace, plus format the C#.
-            return _csharp.GetText();
+            return _output.ToString();
         }
+
+        #region Private helper methods
 
         private void AdvanceTokenIndex(int offset)
         {
             _tokenIndex += offset;
-        }
-
-        private void AppendCSharpNoAdvance(string csharpText)
-        {
-            _csharp.Write(csharpText);
         }
 
         private void AppendCSharp(string csharpText, int advanceTokenIndexBy = 1, bool processHiddenTokensBeforeCurrent = true)
@@ -77,6 +75,41 @@ namespace CoffeeMachine.Internal
             AppendCSharp(csharpText, node.Symbol);
         }
 
+        private void AppendCSharpNoAdvance(string csharpText)
+        {
+            _output.Append(csharpText);
+        }
+
+        private string CaptureOutput(Action action)
+        {
+            var originalOutput = _output;
+            _output = new StringBuilder();
+            action();
+            string result = _output.ToString();
+            _output = originalOutput;
+            return result;
+        }
+
+        private void ProcessHiddenTokensBeforeCurrent()
+        {
+            int start = _tokenIndex;
+            int end = _currentToken.TokenIndex;
+
+            for (int i = start; i < end; i++)
+            {
+                ProcessHiddenToken(_tokenStream.Get(i));
+            }
+        }
+
+        private void ProcessHiddenToken(IToken hiddenToken)
+        {
+            AppendCSharp(hiddenToken.Text, processHiddenTokensBeforeCurrent: false);
+        }
+
+        #endregion
+
+        #region Visit methods
+
         public override Unit VisitErrorNode(IErrorNode node)
         {
             _currentToken = node.Symbol;
@@ -94,7 +127,6 @@ namespace CoffeeMachine.Internal
             // Reference: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/_keywords.html
             switch (_currentToken.Type)
             {
-                // TODO: assert
                 case BOOLEAN:
                     AppendCSharp("bool");
                     break;
@@ -128,22 +160,6 @@ namespace CoffeeMachine.Internal
                     break;
             }
             return default;
-        }
-
-        private void ProcessHiddenTokensBeforeCurrent()
-        {
-            int start = _tokenIndex;
-            int end = _currentToken.TokenIndex;
-
-            for (int i = start; i < end; i++)
-            {
-                ProcessHiddenToken(_tokenStream.Get(i));
-            }
-        }
-
-        private void ProcessHiddenToken(IToken hiddenToken)
-        {
-            AppendCSharp(hiddenToken.Text, processHiddenTokensBeforeCurrent: false);
         }
 
         public override Unit VisitAssertStatementNoMessage([NotNull] AssertStatementNoMessageContext context)
@@ -253,7 +269,7 @@ namespace CoffeeMachine.Internal
                 return default;
             }
 
-            string typeArguments = Fork(clone => clone.Visit(typeArgumentsOrNot));
+            string typeArguments = CaptureOutput(() => Visit(typeArgumentsOrNot));
 
             string csharpMethodName = ConvertToCamelCase(methodName);
             AppendCSharpNoAdvance(csharpMethodName);
@@ -264,5 +280,7 @@ namespace CoffeeMachine.Internal
             Visit(rparen);
             return default;
         }
+
+        #endregion
     }
 }
