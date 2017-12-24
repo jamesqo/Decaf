@@ -199,7 +199,6 @@ namespace CoffeeMachine.Internal
                 case IMPLEMENTS:
                     Write(":");
                     break;
-                // TODO: import
                 case INSTANCEOF:
                     Write("is");
                     break;
@@ -220,6 +219,8 @@ namespace CoffeeMachine.Internal
             }
             return default;
         }
+
+        #region Assertions
 
         public override Unit VisitAssertStatementNoMessage([NotNull] AssertStatementNoMessageContext context)
         {
@@ -242,6 +243,52 @@ namespace CoffeeMachine.Internal
             Write(");", (ITerminalNode)context.GetChild(4));
             return default;
         }
+
+        #endregion
+
+        #region Import declarations
+
+        public override Unit VisitSingleTypeImportDeclaration([NotNull] SingleTypeImportDeclarationContext context)
+        {
+            // 'import' typeName ';'
+            var typeNameNode = context.typeName();
+            string typeName = typeNameNode.GetText();
+            string packageName = GetPackageName(typeName);
+
+            string csharpNamespaceName = ConvertPackageName(packageName);
+            AddUsing(csharpNamespaceName);
+            AdvanceTokenIndex(context.DescendantTokenCount());
+            return default;
+        }
+
+        public override Unit VisitTypeImportOnDemandDeclaration([NotNull] TypeImportOnDemandDeclarationContext context)
+        {
+            // 'import' packageOrTypeName '.' '*' ';'
+            // We can't detect whether the packageOrTypeName node refers to a package or a type,
+            // so just assume it's referring to a package.
+            var packageNameNode = context.packageOrTypeName();
+            string packageName = packageNameNode.GetText();
+
+            string csharpNamespaceName = ConvertPackageName(packageName);
+            AddUsing(csharpNamespaceName);
+            AdvanceTokenIndex(context.DescendantTokenCount());
+            return default;
+        }
+
+        #endregion
+
+        #region Method declarations
+
+        public override Unit VisitThrows_OrNot([NotNull] Throws_OrNotContext context)
+        {
+            // Exclude checked exceptions from the C# output.
+            AdvanceTokenIndex(context.DescendantTokenCount());
+            return default;
+        }
+
+        #endregion
+
+        #region Method invocations
 
         public override Unit VisitSimpleMethodInvocation([NotNull] SimpleMethodInvocationContext context)
         {
@@ -322,12 +369,7 @@ namespace CoffeeMachine.Internal
             return default;
         }
 
-        public override Unit VisitThrows_OrNot([NotNull] Throws_OrNotContext context)
-        {
-            // Exclude checked exceptions from the C# output.
-            AdvanceTokenIndex(context.DescendantTokenCount());
-            return default;
-        }
+        #endregion
 
         #endregion
     }

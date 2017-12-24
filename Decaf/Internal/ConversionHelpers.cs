@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using CoffeeMachine.Internal.Diagnostics;
 using static CoffeeMachine.Internal.Grammars.Java8GrammarHelpers;
@@ -8,6 +9,11 @@ namespace CoffeeMachine.Internal
 {
     internal static class ConversionHelpers
     {
+        private static readonly Dictionary<string, string> s_camelCaseToPascalCaseMap = new Dictionary<string, string>
+        {
+            ["io"] = "IO"
+        };
+
         /// <summary>
         /// Converts a Java getter method name to a C# property name.
         /// </summary>
@@ -81,8 +87,26 @@ namespace CoffeeMachine.Internal
             return string.Join('.', javaPackageName.Split('.').Select(ConvertToPascalCase));
         }
 
+        /// <summary>
+        /// Gets the name of the Java package that contains a Java type.
+        /// </summary>
+        public static string GetPackageName(string javaTypeName)
+        {
+            D.AssertTrue(!string.IsNullOrEmpty(javaTypeName));
+
+            string[] parts = javaTypeName.Split('.');
+            D.AssertTrue(parts.Length > 0);
+            Array.Resize(ref parts, parts.Length - 1);
+            return string.Join('.', parts);
+        }
+
         private static string ConvertToPascalCase(string camelCase)
         {
+            if (s_camelCaseToPascalCaseMap.TryGetValue(camelCase, out string pascalCase))
+            {
+                return pascalCase;
+            }
+
             char newFirstChar = char.ToUpperInvariant(camelCase[0]);
             return newFirstChar + camelCase.Substring(1);
         }
