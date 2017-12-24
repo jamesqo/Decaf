@@ -101,22 +101,10 @@ namespace CoffeeMachine.Internal
         }
 
         private void ProcessHiddenTokensBefore(ITerminalNode currentNode)
-        {
-            D.AssertNotNull(currentNode);
+            => ProcessHiddenTokensBefore(currentNode.Symbol);
 
-            ProcessHiddenTokensBefore(currentNode.Symbol);
-        }
-
-        private void ProcessHiddenTokensBefore(ParserRuleContext currentContext)
-        {
-            D.AssertNotNull(currentContext);
-
-            ITerminalNode node = currentContext.GetLeadingToken();
-            if (node != null)
-            {
-                ProcessHiddenTokensBefore(node);
-            }
-        }
+        private void ProcessHiddenTokensBefore(ParserRuleContext context)
+            => ProcessHiddenTokensBefore(context.Start);
 
         private void SetNamespace(string @namespace) => _namespace = @namespace;
 
