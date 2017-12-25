@@ -42,9 +42,6 @@
     <Compile Update="Internal\Messenger.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="Internal\Optional.cs">
-      <SubType>Code</SubType>
-    </Compile>
   </ItemGroup>
 
 </Project>
