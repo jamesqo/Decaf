@@ -414,7 +414,7 @@ namespace CoffeeMachine.Internal
             // methodName '(' argumentListOrNot ')'
             // methodName : Identifier
             // argumentListOrNot : argumentList?
-            var methodNameNode = context.GetFirstChild<MethodNameContext>().Identifier();
+            var methodNameNode = context.GetFirstChild<MethodNameContext>();
             string methodName = methodNameNode.GetText();
             var lparen = context.GetFirstToken(LPAREN);
             var argumentList = context.GetFirstChild<ArgumentListOrNotContext>().argumentList();
