@@ -19,20 +19,21 @@ namespace CoffeeMachine.Internal
             public StringBuilder Output { get; set; }
             public int TokenIndex { get; set; }
 
-            public RewindableState Clone()
+            public RewindableState Clone() => new RewindableState
             {
-                return new RewindableState
-                {
-                    Output = Output,
-                    TokenIndex = TokenIndex
-                };
-            }
+                Output = Output,
+                TokenIndex = TokenIndex
+            };
+
+            public void ResetOutput() => Output = new StringBuilder();
         }
 
         private readonly BrewOptions _options;
         private readonly ITokenStream _tokenStream;
         private readonly IParseTree _tree;
         private RewindableState _state;
+
+        private readonly Channel<string> _methodInvocationTypeArgumentsChannel;
 
         private readonly HashSet<string> _usings;
         private readonly HashSet<string> _usingStatics;
@@ -45,8 +46,11 @@ namespace CoffeeMachine.Internal
             _tree = tree;
             _state = new RewindableState
             {
-                Output = new StringBuilder()
+                Output = new StringBuilder(),
+                TokenIndex = 0
             };
+
+            _methodInvocationTypeArgumentsChannel = new Channel<string>();
 
             _usings = new HashSet<string>();
             _usingStatics = new HashSet<string>();
@@ -73,16 +77,6 @@ namespace CoffeeMachine.Internal
             _state.TokenIndex += offset;
         }
 
-        private string CaptureOutput(Action action)
-        {
-            var originalState = _state.Clone();
-            _state.Output = new StringBuilder();
-            action();
-            string result = _state.Output.ToString();
-            _state = originalState;
-            return result;
-        }
-
         private void ProcessHiddenToken(IToken hiddenToken)
         {
             Write(hiddenToken.Text);
@@ -106,6 +100,17 @@ namespace CoffeeMachine.Internal
 
         private void ProcessHiddenTokensBefore(ParserRuleContext context)
             => ProcessHiddenTokensBefore(context.Start);
+
+        private T Receive<T>(Channel<T> channel, Action send)
+        {
+            D.AssertTrue(channel.IsEmpty);
+
+            var originalState = _state.Clone();
+            _state.ResetOutput();
+            send();
+            _state = originalState;
+            return channel.Receive();
+        }
 
         private void SetNamespace(string @namespace) => _namespace = @namespace;
 
@@ -356,12 +361,12 @@ namespace CoffeeMachine.Internal
             ProcessHiddenTokensBefore(context);
 
             string methodName = context.GetFirstToken(Identifier).GetText();
-            var typeArgumentsOrNot = context.GetFirstChild<TypeArgumentsOrNotContext>();
-            var typeArgumentsNode = typeArgumentsOrNot.typeArguments();
+            var methodInvocationTypeArgumentsOrNot = context.GetFirstChild<MethodInvocationTypeArgumentsOrNotContext>();
+            var typeArgumentsNode = methodInvocationTypeArgumentsOrNot.typeArgumentsOrNot().typeArguments();
             var argumentListOrNot = context.GetFirstChild<ArgumentListOrNotContext>();
             var argumentList = argumentListOrNot.argumentList();
 
-            this.VisitChildrenBefore(typeArgumentsOrNot, context);
+            this.VisitChildrenBefore(methodInvocationTypeArgumentsOrNot, context);
 
             if (WriteGetterProperty(methodName, argumentList, typeArgumentsNode) ||
                 WriteSetterProperty(methodName, argumentList, typeArgumentsNode))
@@ -371,15 +376,24 @@ namespace CoffeeMachine.Internal
 
             var lparen = context.GetFirstToken(LPAREN);
             var rparen = context.GetFirstToken(RPAREN);
-            string typeArguments = CaptureOutput(() => Visit(typeArgumentsOrNot));
             string csharpMethodName = ConvertMethodName(methodName);
+            string typeArguments = Receive(
+                _methodInvocationTypeArgumentsChannel,
+                () => Visit(methodInvocationTypeArgumentsOrNot));
 
             WriteNoAdvance(csharpMethodName);
             WriteNoAdvance(typeArguments);
-            AdvanceTokenIndex(typeArgumentsOrNot.DescendantTokenCount() + 1); // typeArgumentsOrNot Identifier
+            AdvanceTokenIndex(methodInvocationTypeArgumentsOrNot.DescendantTokenCount() + 1); // methodInvocationTypeArgumentsOrNot Identifier
             Visit(lparen);
             Visit(argumentListOrNot);
             Visit(rparen);
+            return default;
+        }
+
+        public override Unit VisitMethodInvocationTypeArgumentsOrNot([NotNull] MethodInvocationTypeArgumentsOrNotContext context)
+        {
+            Visit(context.typeArgumentsOrNot());
+            _methodInvocationTypeArgumentsChannel.Send(_state.Output.ToString());
             return default;
         }
 
