@@ -433,11 +433,15 @@ unannArrayType
 	;
 
 methodDeclaration
-	:	methodModifier* methodHeader methodBody
+	:	methodModifiers methodHeader methodBody
+	;
+
+methodModifiers
+	:	methodModifier*
 	;
 
 methodModifier
-	:	annotation
+	:	methodAnnotation
 	|	'public'
 	|	'protected'
 	|	'private'
@@ -450,8 +454,20 @@ methodModifier
 	;
 
 methodHeader
+	:	nonGenericMethodHeader
+	|	genericMethodHeader
+	;
+
+nonGenericMethodHeader
 	:	result methodDeclarator throws_OrNot
-	|	typeParameters annotation* result methodDeclarator throws_OrNot
+	;
+
+genericMethodHeader
+	:	typeParameters methodAnnotation* result methodDeclarator throws_OrNot
+	;
+
+methodAnnotation
+	:	annotation
 	;
 
 result

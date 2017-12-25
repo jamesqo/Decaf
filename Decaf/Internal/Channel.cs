@@ -14,14 +14,17 @@ namespace CoffeeMachine.Internal
 
         public bool IsEmpty => _isEmpty;
 
-        public T Receive()
+        public Optional<T> Receive()
         {
-            D.AssertTrue(!_isEmpty, "The channel is empty.");
+            if (IsEmpty)
+            {
+                return Optional<T>.Empty;
+            }
 
             T item = _item;
             _item = default;
             _isEmpty = true;
-            return item;
+            return new Optional<T>(item);
         }
 
         public void Send(T item)

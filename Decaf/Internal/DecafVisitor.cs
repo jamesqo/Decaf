@@ -33,7 +33,9 @@ namespace CoffeeMachine.Internal
         private readonly IParseTree _tree;
         private RewindableState _state;
 
-        private readonly Channel<string> _methodInvocationTypeArgumentsChannel;
+        private readonly Channel<bool> _methodAnnotationChannel;
+        private readonly Channel<bool> _methodDeclarationChannel;
+        private readonly Channel<string> _methodInvocationTypeArgumentsOrNotChannel;
 
         private readonly HashSet<string> _usings;
         private readonly HashSet<string> _usingStatics;
@@ -50,7 +52,9 @@ namespace CoffeeMachine.Internal
                 TokenIndex = 0
             };
 
-            _methodInvocationTypeArgumentsChannel = new Channel<string>();
+            _methodAnnotationChannel = new Channel<bool>();
+            _methodDeclarationChannel = new Channel<bool>();
+            _methodInvocationTypeArgumentsOrNotChannel = new Channel<string>();
 
             _usings = new HashSet<string>();
             _usingStatics = new HashSet<string>();
@@ -101,7 +105,7 @@ namespace CoffeeMachine.Internal
         private void ProcessHiddenTokensBefore(ParserRuleContext context)
             => ProcessHiddenTokensBefore(context.Start);
 
-        private T Receive<T>(Channel<T> channel, Action send)
+        private Optional<T> Receive<T>(Channel<T> channel, Action send)
         {
             D.AssertTrue(channel.IsEmpty);
 
@@ -192,6 +196,19 @@ namespace CoffeeMachine.Internal
             return default;
         }
 
+        #region Annotations
+
+        public override Unit VisitAnnotation([NotNull] AnnotationContext context)
+        {
+            ProcessHiddenTokensBefore(context);
+
+            // Omit the annotations entirely from the C# output.
+            AdvanceTokenIndex(context.DescendantTokenCount());
+            return default;
+        }
+
+        #endregion
+
         #region Assertions
 
         public override Unit VisitAssertStatementNoMessage([NotNull] AssertStatementNoMessageContext context)
@@ -274,6 +291,67 @@ namespace CoffeeMachine.Internal
         #endregion
 
         #region Method declarations
+
+        public override Unit VisitMethodAnnotation([NotNull] MethodAnnotationContext context)
+        {
+            ProcessHiddenTokensBefore(context);
+
+            if (context.GetText() == "@Override")
+            {
+                _methodAnnotationChannel.Send(true);
+            }
+
+            return base.VisitMethodAnnotation(context);
+        }
+
+        public override Unit VisitMethodDeclaration([NotNull] MethodDeclarationContext context)
+        {
+            ProcessHiddenTokensBefore(context);
+
+            // methodDeclaration : methodModifiers methodHeader methodBody
+            var methodModifiers = context.methodModifiers();
+            var methodHeader = context.methodHeader();
+
+            Visit(methodModifiers);
+            bool hasOverrideAnnotation = _methodAnnotationChannel.Receive().GetValueOrDefault(false);
+
+            _methodDeclarationChannel.Send(hasOverrideAnnotation);
+            Visit(methodHeader);
+
+            Visit(context.GetChild(2));
+            return default;
+        }
+
+        public override Unit VisitNonGenericMethodHeader([NotNull] NonGenericMethodHeaderContext context)
+        {
+            ProcessHiddenTokensBefore(context);
+
+            bool hasOverrideAnnotation = _methodDeclarationChannel.Receive().Value;
+            if (hasOverrideAnnotation)
+            {
+                WriteNoAdvance("override ");
+            }
+
+            return base.VisitNonGenericMethodHeader(context);
+        }
+
+        public override Unit VisitGenericMethodHeader([NotNull] GenericMethodHeaderContext context)
+        {
+            ProcessHiddenTokensBefore(context);
+
+            var result = context.result();
+
+            this.VisitChildrenBefore(result, context);
+
+            bool hasOverrideAnnotation =
+                _methodDeclarationChannel.Receive().Value || _methodAnnotationChannel.Receive().Value;
+            if (hasOverrideAnnotation)
+            {
+                WriteNoAdvance("override ");
+            }
+
+            return base.VisitGenericMethodHeader(context);
+        }
 
         public override Unit VisitParameterFinalModifier([NotNull] ParameterFinalModifierContext context)
         {
@@ -378,8 +456,8 @@ namespace CoffeeMachine.Internal
             var rparen = context.GetFirstToken(RPAREN);
             string csharpMethodName = ConvertMethodName(methodName);
             string typeArguments = Receive(
-                _methodInvocationTypeArgumentsChannel,
-                () => Visit(methodInvocationTypeArgumentsOrNot));
+                _methodInvocationTypeArgumentsOrNotChannel,
+                () => Visit(methodInvocationTypeArgumentsOrNot)).Value;
 
             WriteNoAdvance(csharpMethodName);
             WriteNoAdvance(typeArguments);
@@ -393,7 +471,7 @@ namespace CoffeeMachine.Internal
         public override Unit VisitMethodInvocationTypeArgumentsOrNot([NotNull] MethodInvocationTypeArgumentsOrNotContext context)
         {
             Visit(context.typeArgumentsOrNot());
-            _methodInvocationTypeArgumentsChannel.Send(_state.Output.ToString());
+            _methodInvocationTypeArgumentsOrNotChannel.Send(_state.Output.ToString());
             return default;
         }
 
