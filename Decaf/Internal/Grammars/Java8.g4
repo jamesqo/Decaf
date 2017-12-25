@@ -453,6 +453,10 @@ methodModifier
 	|	'strictfp'
 	;
 
+methodAnnotation
+	:	annotation
+	;
+
 methodHeader
 	:	nonGenericMethodHeader
 	|	genericMethodHeader
@@ -463,11 +467,15 @@ nonGenericMethodHeader
 	;
 
 genericMethodHeader
-	:	typeParameters methodAnnotation* result methodDeclarator throws_OrNot
+	:	methodTypeParameters methodAnnotations result methodDeclarator throws_OrNot
 	;
 
-methodAnnotation
-	:	annotation
+methodTypeParameters
+	:	typeParameters
+	;
+
+methodAnnotations
+	:	methodAnnotation*
 	;
 
 result
