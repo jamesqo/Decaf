@@ -21,6 +21,9 @@
   </ItemGroup>
   
   <ItemGroup>
+    <Compile Update="Internal\Channel.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Internal\ConversionHelpers.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -34,6 +37,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Internal\Grammars\Java8GrammarHelpers.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Internal\Messenger.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

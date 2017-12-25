@@ -177,6 +177,10 @@ typeArgumentsOrNot
 	:	typeArguments?
 	;
 
+methodInvocationTypeArgumentsOrNot
+	:	typeArgumentsOrNot
+	;
+
 typeArgumentList
 	:	typeArgument (',' typeArgument)*
 	;
@@ -429,11 +433,15 @@ unannArrayType
 	;
 
 methodDeclaration
-	:	methodModifier* methodHeader methodBody
+	:	methodModifiers methodHeader methodBody
+	;
+
+methodModifiers
+	:	methodModifier*
 	;
 
 methodModifier
-	:	annotation
+	:	methodAnnotation
 	|	'public'
 	|	'protected'
 	|	'private'
@@ -445,9 +453,29 @@ methodModifier
 	|	'strictfp'
 	;
 
+methodAnnotation
+	:	annotation
+	;
+
 methodHeader
+	:	nonGenericMethodHeader
+	|	genericMethodHeader
+	;
+
+nonGenericMethodHeader
 	:	result methodDeclarator throws_OrNot
-	|	typeParameters annotation* result methodDeclarator throws_OrNot
+	;
+
+genericMethodHeader
+	:	methodTypeParameters methodAnnotations result methodDeclarator throws_OrNot
+	;
+
+methodTypeParameters
+	:	typeParameters
+	;
+
+methodAnnotations
+	:	methodAnnotation*
 	;
 
 result
@@ -1146,15 +1174,15 @@ simpleMethodInvocation
 	;
 
 notSoSimpleMethodInvocation
-	:	typeName '.' typeArgumentsOrNot Identifier '(' argumentListOrNot ')'
-	|	expressionName '.' typeArgumentsOrNot Identifier '(' argumentListOrNot ')'
-	|	primary '.' typeArgumentsOrNot Identifier '(' argumentListOrNot ')'
-	|	'super' '.' typeArgumentsOrNot Identifier '(' argumentListOrNot ')'
-	|	typeName '.' 'super' '.' typeArgumentsOrNot Identifier '(' argumentListOrNot ')'
+	:	typeName '.' methodInvocationTypeArgumentsOrNot Identifier '(' argumentListOrNot ')'
+	|	expressionName '.' methodInvocationTypeArgumentsOrNot Identifier '(' argumentListOrNot ')'
+	|	primary '.' methodInvocationTypeArgumentsOrNot Identifier '(' argumentListOrNot ')'
+	|	'super' '.' methodInvocationTypeArgumentsOrNot Identifier '(' argumentListOrNot ')'
+	|	typeName '.' 'super' '.' methodInvocationTypeArgumentsOrNot Identifier '(' argumentListOrNot ')'
 	;
 
 methodInvocation_lf_primary
-	:	'.' typeArgumentsOrNot Identifier '(' argumentListOrNot ')'
+	:	'.' methodInvocationTypeArgumentsOrNot Identifier '(' argumentListOrNot ')'
 	;
 
 methodInvocation_lfno_primary
@@ -1167,10 +1195,10 @@ simpleMethodInvocation_lfno_primary
 	;
 
 notSoSimpleMethodInvocation_lfno_primary
-	:	typeName '.' typeArgumentsOrNot Identifier '(' argumentListOrNot ')'
-	|	expressionName '.' typeArgumentsOrNot Identifier '(' argumentListOrNot ')'
-	|	'super' '.' typeArgumentsOrNot Identifier '(' argumentListOrNot ')'
-	|	typeName '.' 'super' '.' typeArgumentsOrNot Identifier '(' argumentListOrNot ')'
+	:	typeName '.' methodInvocationTypeArgumentsOrNot Identifier '(' argumentListOrNot ')'
+	|	expressionName '.' methodInvocationTypeArgumentsOrNot Identifier '(' argumentListOrNot ')'
+	|	'super' '.' methodInvocationTypeArgumentsOrNot Identifier '(' argumentListOrNot ')'
+	|	typeName '.' 'super' '.' methodInvocationTypeArgumentsOrNot Identifier '(' argumentListOrNot ')'
 	;
 
 argumentList
