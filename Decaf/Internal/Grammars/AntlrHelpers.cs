@@ -8,38 +8,51 @@ namespace CoffeeMachine.Internal.Grammars
     {
         public static int DescendantTokenCount(this ParserRuleContext context)
         {
+            if (context.ChildCount == 0)
+            {
+                return 0;
+            }
+
             var (start, stop) = (context.Start, context.Stop);
             return stop.TokenIndex - start.TokenIndex + 1;
         }
 
-        public static T GetFirstChild<T>(this IParseTree tree)
-            where T : IParseTree
+        public static int FindChild(this IParseTree parent, IParseTree child)
         {
-            int childCount = tree.ChildCount;
+            D.AssertEqual(child.Parent, parent);
+
+            int childCount = parent.ChildCount;
             for (int i = 0; i < childCount; i++)
             {
-                if (tree.GetChild(i) is T child)
+                if (child == parent.GetChild(i))
                 {
-                    return child;
+                    return i;
                 }
             }
 
-            return default;
+            return -1;
         }
 
-        public static ITerminalNode GetFirstToken(this IParseTree tree, int tokenType)
+        public static T GetFirstChild<T>(this ParserRuleContext context)
+            where T : IParseTree
         {
-            int childCount = tree.ChildCount;
-            for (int i = 0; i < childCount; i++)
-            {
-                if (tree.GetChild(i) is ITerminalNode terminal &&
-                    terminal.Symbol?.Type == tokenType)
-                {
-                    return terminal;
-                }
-            }
+            return context.GetChild<T>(0);
+        }
 
-            return null;
+        public static ITerminalNode GetFirstToken(this ParserRuleContext context, int tokenType)
+        {
+            return context.GetToken(tokenType, 0);
+        }
+
+        public static void VisitChildrenAfter(this AbstractParseTreeVisitor<Unit> visitor, IParseTree start, IParseTree parent)
+        {
+            D.AssertEqual(start.Parent, parent);
+
+            int childCount = parent.ChildCount;
+            for (int i = parent.FindChild(start) + 1; i < childCount; i++)
+            {
+                visitor.Visit(parent.GetChild(i));
+            }
         }
 
         public static void VisitChildrenBefore(this AbstractParseTreeVisitor<Unit> visitor, IParseTree stop, IParseTree parent)
