@@ -2,37 +2,31 @@
 
 namespace CoffeeMachine.Internal
 {
-    internal class Channel<T>
+    internal struct Channel<T>
     {
-        private T _item;
-        private bool _isEmpty;
+        private T _value;
+        private bool _hasValue;
 
-        public Channel()
+        public bool IsEmpty => !_hasValue;
+
+        public T Receive()
         {
-            _isEmpty = true;
+            D.AssertTrue(_hasValue, "The channel is empty.");
+
+            T item = _value;
+            _value = default;
+            _hasValue = false;
+            return item;
         }
 
-        public bool IsEmpty => _isEmpty;
-
-        public Optional<T> Receive()
-        {
-            if (IsEmpty)
-            {
-                return Optional<T>.Empty;
-            }
-
-            T item = _item;
-            _item = default;
-            _isEmpty = true;
-            return new Optional<T>(item);
-        }
+        public T ReceiveOrDefault(T defaultValue) => _hasValue ? Receive() : defaultValue;
 
         public void Send(T item)
         {
-            D.AssertTrue(_isEmpty, "Channels can only hold one item at a time.");
+            D.AssertTrue(!_hasValue, "Channels can only hold one item at a time.");
 
-            _item = item;
-            _isEmpty = false;
+            _value = item;
+            _hasValue = true;
         }
     }
 }
