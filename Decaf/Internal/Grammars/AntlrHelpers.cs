@@ -6,8 +6,6 @@ namespace CoffeeMachine.Internal.Grammars
 {
     internal static class AntlrHelpers
     {
-        public static int DescendantTokenCount(this ITerminalNode node) => 1;
-
         public static int DescendantTokenCount(this ParserRuleContext context)
         {
             if (context.ChildCount == 0)
@@ -35,34 +33,15 @@ namespace CoffeeMachine.Internal.Grammars
             return -1;
         }
 
-        public static T GetFirstChild<T>(this IParseTree tree)
+        public static T GetFirstChild<T>(this ParserRuleContext context)
             where T : IParseTree
         {
-            int childCount = tree.ChildCount;
-            for (int i = 0; i < childCount; i++)
-            {
-                if (tree.GetChild(i) is T child)
-                {
-                    return child;
-                }
-            }
-
-            return default;
+            return context.GetChild<T>(0);
         }
 
-        public static ITerminalNode GetFirstToken(this IParseTree tree, int tokenType)
+        public static ITerminalNode GetFirstToken(this ParserRuleContext context, int tokenType)
         {
-            int childCount = tree.ChildCount;
-            for (int i = 0; i < childCount; i++)
-            {
-                if (tree.GetChild(i) is ITerminalNode terminal &&
-                    terminal.Symbol?.Type == tokenType)
-                {
-                    return terminal;
-                }
-            }
-
-            return null;
+            return context.GetToken(tokenType, 0);
         }
 
         public static void VisitChildrenAfter(this AbstractParseTreeVisitor<Unit> visitor, IParseTree start, IParseTree parent)

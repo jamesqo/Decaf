@@ -33,7 +33,7 @@ namespace CoffeeMachine.Internal
         private readonly IParseTree _tree;
         private RewindableState _state;
 
-        // These are mutable structs; do not make them readonly.
+        // These are mutable structs; do not make them readonly nor copy them.
         private Channel<string> _genericMethodHeaderChannel;
         private Channel<bool> _methodAnnotationChannel;
         private Channel<bool> _methodDeclarationChannel;
