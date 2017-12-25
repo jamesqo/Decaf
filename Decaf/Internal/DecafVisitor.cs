@@ -437,6 +437,34 @@ namespace CoffeeMachine.Internal
 
         #endregion
 
+        #region Type references
+
+        public override Unit VisitUnannClassOrInterfaceType([NotNull] UnannClassOrInterfaceTypeContext context)
+        {
+            string typeName = context.GetText();
+            string csharpTypeName;
+
+            switch (typeName)
+            {
+                case "Object":
+                    csharpTypeName = "object";
+                    break;
+                case "String":
+                    csharpTypeName = "string";
+                    break;
+                default:
+                    return base.VisitUnannClassOrInterfaceType(context);
+            }
+
+            ProcessHiddenTokensBefore(context);
+
+            WriteNoAdvance(csharpTypeName);
+            AdvanceTokenIndex(context.DescendantTokenCount());
+            return default;
+        }
+
+        #endregion
+
         #endregion
     }
 }
