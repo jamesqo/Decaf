@@ -14,25 +14,11 @@ namespace CoffeeMachine.Internal
 {
     internal class DecafVisitor : Java8BaseVisitor<Unit>
     {
-        private class RewindableState
-        {
-            public StringBuilder Output { get; set; }
-            public int TokenIndex { get; set; }
-
-            public RewindableState Clone()
-            {
-                return new RewindableState
-                {
-                    Output = Output,
-                    TokenIndex = TokenIndex
-                };
-            }
-        }
-
         private readonly BrewOptions _options;
         private readonly ITokenStream _tokenStream;
         private readonly IParseTree _tree;
-        private RewindableState _state;
+        private readonly StringBuilder _output;
+        private int _tokenIndex;
 
         private readonly HashSet<string> _usings;
         private readonly HashSet<string> _usingStatics;
@@ -43,10 +29,7 @@ namespace CoffeeMachine.Internal
             _options = options;
             _tokenStream = tokenStream;
             _tree = tree;
-            _state = new RewindableState
-            {
-                Output = new StringBuilder()
-            };
+            _output = new StringBuilder();
 
             _usings = new HashSet<string>();
             _usingStatics = new HashSet<string>();
@@ -57,7 +40,7 @@ namespace CoffeeMachine.Internal
         {
             Visit(_tree);
             return CSharpFormatter.Format(
-                csharpCode: _state.Output.ToString(),
+                csharpCode: _output.ToString(),
                 withUsings: _usings,
                 withUsingStatics: _usingStatics,
                 withNamespace: _namespace,
@@ -70,17 +53,7 @@ namespace CoffeeMachine.Internal
 
         private void AdvanceTokenIndex(int offset)
         {
-            _state.TokenIndex += offset;
-        }
-
-        private string CaptureOutput(Action action)
-        {
-            var originalState = _state.Clone();
-            _state.Output = new StringBuilder();
-            action();
-            string result = _state.Output.ToString();
-            _state = originalState;
-            return result;
+            _tokenIndex += offset;
         }
 
         private void ProcessHiddenToken(IToken hiddenToken)
@@ -92,7 +65,7 @@ namespace CoffeeMachine.Internal
         {
             D.AssertNotNull(currentToken);
 
-            int start = _state.TokenIndex;
+            int start = _tokenIndex;
             int end = currentToken.TokenIndex;
 
             for (int i = start; i < end; i++)
@@ -129,7 +102,7 @@ namespace CoffeeMachine.Internal
 
         private void WriteNoAdvance(string csharpText)
         {
-            _state.Output.Append(csharpText);
+            _output.Append(csharpText);
         }
 
         #endregion
@@ -356,7 +329,7 @@ namespace CoffeeMachine.Internal
             ProcessHiddenTokensBefore(context);
 
             string methodName = context.GetFirstToken(Identifier).GetText();
-            var typeArgumentsOrNot = context.GetFirstChild<TypeArgumentsOrNotContext>();
+            var typeArgumentsOrNot = context.GetFirstChild<MethodInvocationTypeArgumentsOrNotContext>();
             var typeArgumentsNode = typeArgumentsOrNot.typeArguments();
             var argumentListOrNot = context.GetFirstChild<ArgumentListOrNotContext>();
             var argumentList = argumentListOrNot.argumentList();
@@ -371,8 +344,12 @@ namespace CoffeeMachine.Internal
 
             var lparen = context.GetFirstToken(LPAREN);
             var rparen = context.GetFirstToken(RPAREN);
-            string typeArguments = CaptureOutput(() => Visit(typeArgumentsOrNot));
             string csharpMethodName = ConvertMethodName(methodName);
+
+            Visit(typeArgumentsOrNot);
+            string typeArguments = ReceiveMessage(
+                _typeArgumentsOrNotToMethodInvocationMessenger,
+                messageSender: () => Visit(typeArgumentsOrNot));
 
             WriteNoAdvance(csharpMethodName);
             WriteNoAdvance(typeArguments);
