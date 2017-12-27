@@ -121,30 +121,20 @@ namespace CoffeeMachine.Internal
 
         private string Record(Action action)
         {
-            var tempState = RunAndRewind(action);
-            string result = tempState.Output.ToString();
-            tempState.Output = _rstate.Output;
-            _rstate = tempState;
+            var originalOutput = _rstate.Output;
+            _rstate.ResetOutput();
+            action();
+            string result = _rstate.Output.ToString();
+            _rstate.Output = originalOutput;
             return result;
         }
 
-        /*
-        private string RecordAndRewind(Action action)
-        {
-            var tempState = RunAndRewind(action);
-            return tempState.Output.ToString();
-        }
-        */
-
-        private RewindableState RunAndRewind(Action action)
+        private void RunAndRewind(Action action)
         {
             var originalState = _rstate.Clone();
             _rstate.ResetOutput();
             action();
-
-            var tempState = _rstate;
             _rstate = originalState;
-            return tempState;
         }
 
         private void Write(string csharpText)
