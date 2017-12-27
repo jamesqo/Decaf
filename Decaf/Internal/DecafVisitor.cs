@@ -400,9 +400,13 @@ namespace CoffeeMachine.Internal
         {
             // Identifier '(' formalParameterList? ')' dims?
             var identifierNode = context.GetFirstToken(Identifier);
+            string methodName = identifierNode.GetText();
+
+            string csharpMethodName = ConvertMethodName(methodName);
             string typeParameters = _genericMethodHeaderChannel.ReceiveOrDefault(string.Empty);
 
-            Visit(identifierNode);
+            MovePast(identifierNode);
+            Write(csharpMethodName);
             Write(typeParameters);
             this.VisitChildrenAfter(identifierNode, context);
             return default;
