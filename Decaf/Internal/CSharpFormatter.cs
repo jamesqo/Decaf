@@ -17,25 +17,46 @@ namespace CoffeeMachine.Internal
             CSharpGlobalState state,
             BrewOptions options)
         {
-            csharpCode = AddClasses(csharpCode, state.Classes);
-            var tree = CSharpSyntaxTree.ParseText(csharpCode, options.GetCSharpParseOptions());
+            var parseOptions = options.GetCSharpParseOptions();
+            var tree = CSharpSyntaxTree.ParseText(csharpCode, parseOptions);
             var root = tree.GetCompilationUnitRoot(options.CancellationToken);
 
-            root = AddUsings(root, state.Usings, state.UsingStatics);
+            root = AddClasses(root, state.Classes, parseOptions);
             root = AddNamespace(root, state.Namespace);
+            root = AddUsings(root, state.Usings, state.UsingStatics);
             root = root.WithAdditionalAnnotations(Formatter.Annotation, Simplifier.Annotation).NormalizeWhitespace();
             return root.ToFullString();
         }
 
-        private static string AddClasses(string csharpCode, Dictionary<string, string> classes)
+        private static CompilationUnitSyntax AddClasses(CompilationUnitSyntax root, Dictionary<string, string> classes, CSharpParseOptions options)
         {
-            IEnumerable<string> classDeclarations = classes.Select(CreateClassDeclaration);
-            return string.Join(CSharpConstants.NewLine, classDeclarations) + csharpCode;
+            return root.AddMembers(classes.Select(CreateClassDeclaration).ToArray());
 
-            string CreateClassDeclaration(KeyValuePair<string, string> pair)
+            ClassDeclarationSyntax CreateClassDeclaration(KeyValuePair<string, string> pair)
             {
                 var (className, classBody) = pair;
-                return $"class {className} {classBody}";
+                return RoslynHelpers.ParseClassDeclaration($"class {className} {classBody}", options);
+            }
+        }
+
+        private static CompilationUnitSyntax AddNamespace(CompilationUnitSyntax root, string @namespace)
+        {
+            if (string.IsNullOrEmpty(@namespace))
+            {
+                return root;
+            }
+
+            return root.WithMembers(
+                SyntaxFactory.SingletonList<MemberDeclarationSyntax>(
+                    CreateNamespaceDeclaration(@namespace, root.Members)));
+
+            NamespaceDeclarationSyntax CreateNamespaceDeclaration(string name, SyntaxList<MemberDeclarationSyntax> members)
+            {
+                return SyntaxFactory.NamespaceDeclaration(
+                    SyntaxFactory.IdentifierName(name),
+                    externs: default,
+                    usings: default,
+                    members);
             }
         }
 
@@ -59,27 +80,6 @@ namespace CoffeeMachine.Internal
                     SyntaxFactory.Token(SyntaxKind.StaticKeyword),
                     alias: null,
                     SyntaxFactory.IdentifierName(@namespace));
-            }
-        }
-
-        private static CompilationUnitSyntax AddNamespace(CompilationUnitSyntax root, string @namespace)
-        {
-            if (string.IsNullOrEmpty(@namespace))
-            {
-                return root;
-            }
-
-            return root.WithMembers(
-                SyntaxFactory.SingletonList<MemberDeclarationSyntax>(
-                    CreateNamespaceDeclaration(@namespace, root.Members)));
-
-            NamespaceDeclarationSyntax CreateNamespaceDeclaration(string name, SyntaxList<MemberDeclarationSyntax> members)
-            {
-                return SyntaxFactory.NamespaceDeclaration(
-                    SyntaxFactory.IdentifierName(name),
-                    externs: default,
-                    usings: default,
-                    members);
             }
         }
     }

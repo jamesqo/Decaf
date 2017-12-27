@@ -45,6 +45,9 @@
     <Compile Update="Internal\Messenger.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Internal\RoslynHelpers.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Internal\Television.cs">
       <SubType>Code</SubType>
     </Compile>

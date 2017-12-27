@@ -159,6 +159,9 @@ namespace CoffeeMachine.Internal
             // Reference: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/_keywords.html
             switch (node.Symbol.Type)
             {
+                case TokenConstants.Eof:
+                    // Don't write anything.
+                    break;
                 case BOOLEAN:
                     Write("bool");
                     break;
@@ -267,17 +270,19 @@ namespace CoffeeMachine.Internal
 
             this.VisitChildrenBefore(identifierNode, context);
 
+            string baseClassName = default;
             string anonymousClassBody = default;
             RunAndRewind(() =>
             {
-                Visit(identifierNode);
+                baseClassName = Record(() => Visit(identifierNode));
                 this.VisitChildrenBetween(identifierNode, classBodyOrNot, context);
                 anonymousClassBody = Record(() => Visit(classBodyOrNot));
             });
 
             if (!string.IsNullOrEmpty(anonymousClassBody))
             {
-                string className = _gstate.AddAnonymousClass(anonymousClassBody);
+                string className = _options.FormatAnonymousClassName(baseClassName);
+                _gstate.AddAnonymousClass(className, anonymousClassBody);
                 MovePast(identifierNode);
                 Write(className);
             }

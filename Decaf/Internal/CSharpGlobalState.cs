@@ -9,7 +9,6 @@ namespace CoffeeMachine.Internal
         private readonly HashSet<string> _usingStatics;
 
         private string _namespace;
-        private int _numberOfAnonymousClasses;
 
         public CSharpGlobalState()
         {
@@ -18,7 +17,6 @@ namespace CoffeeMachine.Internal
             _usingStatics = new HashSet<string>();
 
             _namespace = string.Empty;
-            _numberOfAnonymousClasses = 0;
         }
 
         public Dictionary<string, string> Classes => _classes;
@@ -26,12 +24,13 @@ namespace CoffeeMachine.Internal
         public HashSet<string> Usings => _usings;
         public HashSet<string> UsingStatics => _usingStatics;
 
-        public string AddAnonymousClass(string classBody)
+        public void AddAnonymousClass(string className, string classBody)
         {
-            _numberOfAnonymousClasses++;
-            string className = $"Anon{_numberOfAnonymousClasses}";
-            AddClass(className, classBody);
-            return className;
+            int suffix = 1;
+            while (!AddClass($"{className}{suffix}", classBody))
+            {
+                suffix++;
+            }
         }
 
         public bool AddClass(string className, string classBody)
