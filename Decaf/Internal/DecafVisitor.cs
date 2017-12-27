@@ -280,7 +280,7 @@ namespace CoffeeMachine.Internal
 
             if (!string.IsNullOrEmpty(anonymousClassBody))
             {
-                string baseClassName = identifierNode.GetText();
+                string baseClassName = GetUnqualifiedTypeName(identifierNode.GetText());
                 string className = _options.FormatAnonymousClassName(baseClassName);
                 className = _gstate.AddAnonymousClass(className, anonymousClassBody);
                 MovePast(identifierNode);
