@@ -171,6 +171,10 @@ namespace CoffeeMachine.Internal
                 case FINAL:
                     Write("readonly");
                     break;
+                case Identifier:
+                    string identifier = EscapeIdentifierForCSharp(node.GetText());
+                    Write(identifier);
+                    break;
                 case IMPLEMENTS:
                     Write(":");
                     break;

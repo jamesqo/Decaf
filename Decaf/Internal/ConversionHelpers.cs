@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using CoffeeMachine.Internal.Diagnostics;
+using Microsoft.CodeAnalysis.CSharp;
 using static CoffeeMachine.Internal.Grammars.Java8GrammarHelpers;
 using static CoffeeMachine.Internal.Grammars.Java8Parser;
 
@@ -88,6 +89,14 @@ namespace CoffeeMachine.Internal
         }
 
         /// <summary>
+        /// Escapes a reserved identifier so that it is a valid C# identifier.
+        /// </summary>
+        public static string EscapeIdentifierForCSharp(string identifier)
+        {
+            return IsCSharpKeyword(identifier) ? '@' + identifier : identifier;
+        }
+
+        /// <summary>
         /// Gets the name of the Java package that contains a type.
         /// </summary>
         public static string GetPackageName(string javaTypeName)
@@ -163,6 +172,11 @@ namespace CoffeeMachine.Internal
 
             char newFirstChar = char.ToUpperInvariant(camelCase[0]);
             return newFirstChar + camelCase.Substring(1);
+        }
+
+        private static bool IsCSharpKeyword(string text)
+        {
+            return SyntaxFacts.GetKeywordKind(text) != SyntaxKind.None;
         }
     }
 }
