@@ -21,6 +21,9 @@
   </ItemGroup>
   
   <ItemGroup>
+    <Compile Update="Internal\CSharpClassInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Internal\CSharpConstants.cs">
       <SubType>Code</SubType>
     </Compile>

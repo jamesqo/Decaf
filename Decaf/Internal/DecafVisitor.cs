@@ -282,7 +282,13 @@ namespace CoffeeMachine.Internal
             {
                 string baseClassName = GetUnqualifiedTypeName(identifierNode.GetText());
                 string className = _options.FormatAnonymousClassName(baseClassName);
-                className = _gstate.AddAnonymousClass(className, anonymousClassBody);
+                className = _gstate.AddAnonymousClass(className, new CSharpClassInfo
+                {
+                    BaseTypes = new[] { baseClassName },
+                    Body = anonymousClassBody,
+                    Modifiers = new[] { "internal" }
+                });
+
                 MovePast(identifierNode);
                 Write(className);
             }

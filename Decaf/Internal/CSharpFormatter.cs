@@ -28,14 +28,17 @@ namespace CoffeeMachine.Internal
             return root.ToFullString();
         }
 
-        private static CompilationUnitSyntax AddClasses(CompilationUnitSyntax root, Dictionary<string, string> classes, CSharpParseOptions options)
+        private static CompilationUnitSyntax AddClasses(CompilationUnitSyntax root, Dictionary<string, CSharpClassInfo> classes, CSharpParseOptions options)
         {
             return root.AddMembers(classes.Select(CreateClassDeclaration).ToArray());
 
-            ClassDeclarationSyntax CreateClassDeclaration(KeyValuePair<string, string> pair)
+            ClassDeclarationSyntax CreateClassDeclaration(KeyValuePair<string, CSharpClassInfo> pair)
             {
-                var (className, classBody) = pair;
-                return RoslynHelpers.ParseClassDeclaration($"class {className} {classBody}", options);
+                var (name, info) = pair;
+                string baseTypes = string.Join(", ", info.BaseTypes);
+                string modifiers = string.Join(" ", info.Modifiers);
+                string text = $"{modifiers} class {name} : {baseTypes} {info.Body}";
+                return RoslynHelpers.ParseClassDeclaration(text, options);
             }
         }
 
