@@ -30,7 +30,7 @@ namespace CoffeeMachine.Internal
         private static string AddClasses(string csharpCode, Dictionary<string, string> classes)
         {
             IEnumerable<string> classDeclarations = classes.Select(CreateClassDeclaration);
-            return string.Join(Environment.NewLine, classDeclarations) + csharpCode;
+            return string.Join(CSharpConstants.NewLine, classDeclarations) + csharpCode;
 
             string CreateClassDeclaration(KeyValuePair<string, string> pair)
             {

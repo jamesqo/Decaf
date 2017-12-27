@@ -35,6 +35,7 @@ namespace CoffeeMachine.Internal
         private RewindableState _rstate;
 
         // These are mutable structs; do not make them readonly nor copy them.
+        private Channel<string> _anonymousClassBodyOrNotChannel;
         private Channel<string> _genericMethodHeaderChannel;
         private Channel<bool> _methodAnnotationChannel;
         private Channel<bool> _methodDeclarationChannel;
@@ -235,6 +236,65 @@ namespace CoffeeMachine.Internal
 
         #endregion
 
+        #region Class declarations
+
+        public override Unit VisitAnonymousClassBodyOrNot([NotNull] AnonymousClassBodyOrNotContext context)
+        {
+            var classBody = context.classBody();
+
+            _anonymousClassBodyOrNotChannel.Send(classBody?.GetText() ?? string.Empty);
+            return default;
+        }
+
+        public override Unit VisitClassInstanceCreationExpression([NotNull] ClassInstanceCreationExpressionContext context)
+        {
+            return CommonVisitClassInstanceCreationExpression(context);
+        }
+
+        public override Unit VisitClassInstanceCreationExpression_lf_primary([NotNull] ClassInstanceCreationExpression_lf_primaryContext context)
+        {
+            return CommonVisitClassInstanceCreationExpression(context);
+        }
+
+        public override Unit VisitClassInstanceCreationExpression_lfno_primary([NotNull] ClassInstanceCreationExpression_lfno_primaryContext context)
+        {
+            return CommonVisitClassInstanceCreationExpression(context);
+        }
+
+        private Unit CommonVisitClassInstanceCreationExpression(ParserRuleContext context)
+        {
+            var identifierNode = context.GetFirstToken(Identifier);
+            var classBodyOrNot = context.GetFirstChild<AnonymousClassBodyOrNotContext>();
+
+            this.VisitChildrenBefore(identifierNode, context);
+
+            RunAndRewind(() =>
+            {
+                Visit(identifierNode);
+                this.VisitChildrenBetween(identifierNode, classBodyOrNot, context);
+                Visit(classBodyOrNot);
+            });
+
+            string anonymousClassBody = _anonymousClassBodyOrNotChannel.Receive();
+
+            if (!string.IsNullOrEmpty(anonymousClassBody))
+            {
+                string className = _gstate.AddAnonymousClass(anonymousClassBody);
+                MovePast(identifierNode);
+                Write(className);
+            }
+            else
+            {
+                Visit(identifierNode);
+            }
+
+            this.VisitChildrenBetween(identifierNode, classBodyOrNot, context);
+            MovePast(classBodyOrNot);
+            return default;
+        }
+
+        #endregion
+
         #region Import declarations
 
         public override Unit VisitSingleTypeImportDeclaration([NotNull] SingleTypeImportDeclarationContext context)
@@ -308,11 +368,7 @@ namespace CoffeeMachine.Internal
 
         public override Unit VisitMethodAnnotation([NotNull] MethodAnnotationContext context)
         {
-            if (context.GetText() == "@Override")
-            {
-                _methodAnnotationChannel.Send(true);
-            }
-
+            _methodAnnotationChannel.Send(context.GetText() == "@Override");
             return base.VisitMethodAnnotation(context);
         }
 
@@ -386,7 +442,7 @@ namespace CoffeeMachine.Internal
 
         #endregion
 
-        #region Method invocations
+        #region Method references
 
         public override Unit VisitSimpleMethodInvocation([NotNull] SimpleMethodInvocationContext context)
         {

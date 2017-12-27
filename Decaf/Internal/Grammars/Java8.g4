@@ -1107,18 +1107,22 @@ primaryNoNewArray_lfno_primary_lfno_arrayAccess_lfno_primary
 	;
 
 classInstanceCreationExpression
-	:	'new' typeArgumentsOrNot annotation* Identifier ('.' annotation* Identifier)* typeArgumentsOrDiamond? '(' argumentListOrNot ')' classBody?
-	|	expressionName '.' 'new' typeArgumentsOrNot annotation* Identifier typeArgumentsOrDiamond? '(' argumentListOrNot ')' classBody?
-	|	primary '.' 'new' typeArgumentsOrNot annotation* Identifier typeArgumentsOrDiamond? '(' argumentListOrNot ')' classBody?
+	:	'new' typeArgumentsOrNot annotation* Identifier ('.' annotation* Identifier)* typeArgumentsOrDiamond? '(' argumentListOrNot ')' anonymousClassBodyOrNot
+	|	expressionName '.' 'new' typeArgumentsOrNot annotation* Identifier typeArgumentsOrDiamond? '(' argumentListOrNot ')' anonymousClassBodyOrNot
+	|	primary '.' 'new' typeArgumentsOrNot annotation* Identifier typeArgumentsOrDiamond? '(' argumentListOrNot ')' anonymousClassBodyOrNot
 	;
 
 classInstanceCreationExpression_lf_primary
-	:	'.' 'new' typeArgumentsOrNot annotation* Identifier typeArgumentsOrDiamond? '(' argumentListOrNot ')' classBody?
+	:	'.' 'new' typeArgumentsOrNot annotation* Identifier typeArgumentsOrDiamond? '(' argumentListOrNot ')' anonymousClassBodyOrNot
 	;
 
 classInstanceCreationExpression_lfno_primary
-	:	'new' typeArgumentsOrNot annotation* Identifier ('.' annotation* Identifier)* typeArgumentsOrDiamond? '(' argumentListOrNot ')' classBody?
-	|	expressionName '.' 'new' typeArgumentsOrNot annotation* Identifier typeArgumentsOrDiamond? '(' argumentListOrNot ')' classBody?
+	:	'new' typeArgumentsOrNot annotation* Identifier ('.' annotation* Identifier)* typeArgumentsOrDiamond? '(' argumentListOrNot ')' anonymousClassBodyOrNot
+	|	expressionName '.' 'new' typeArgumentsOrNot annotation* Identifier typeArgumentsOrDiamond? '(' argumentListOrNot ')' anonymousClassBodyOrNot
+	;
+
+anonymousClassBodyOrNot
+	:	classBody?
 	;
 
 typeArgumentsOrDiamond
