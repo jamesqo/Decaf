@@ -11,7 +11,7 @@ using static CoffeeMachine.Internal.Grammars.Java8Parser;
 
 namespace CoffeeMachine.Internal
 {
-    internal partial class DecafVisitor : Java8BaseVisitor<Unit>
+    internal class DecafVisitor : Java8BaseVisitor<Unit>
     {
         private class RewindableState
         {
