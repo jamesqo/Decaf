@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using CoffeeMachine.Internal.Diagnostics;
 using Microsoft.CodeAnalysis;
@@ -13,17 +14,29 @@ namespace CoffeeMachine.Internal
     {
         public static string Format(
             string csharpCode,
-            HashSet<string> withUsings,
-            HashSet<string> withUsingStatics,
-            string withNamespace,
+            CSharpGlobalState state,
             BrewOptions options)
         {
+            csharpCode = AddClasses(csharpCode, state.Classes);
             var tree = CSharpSyntaxTree.ParseText(csharpCode, options.GetCSharpParseOptions());
             var root = tree.GetCompilationUnitRoot(options.CancellationToken);
-            root = AddUsings(root, withUsings, withUsingStatics);
-            root = AddNamespace(root, withNamespace);
+
+            root = AddUsings(root, state.Usings, state.UsingStatics);
+            root = AddNamespace(root, state.Namespace);
             root = root.WithAdditionalAnnotations(Formatter.Annotation, Simplifier.Annotation).NormalizeWhitespace();
             return root.ToFullString();
+        }
+
+        private static string AddClasses(string csharpCode, Dictionary<string, string> classes)
+        {
+            IEnumerable<string> classDeclarations = classes.Select(CreateClassDeclaration);
+            return string.Join(Environment.NewLine, classDeclarations) + csharpCode;
+
+            string CreateClassDeclaration(KeyValuePair<string, string> pair)
+            {
+                var (className, classBody) = pair;
+                return $"class {className} {classBody}";
+            }
         }
 
         private static CompilationUnitSyntax AddUsings(CompilationUnitSyntax root, HashSet<string> usings, HashSet<string> usingStatics)
