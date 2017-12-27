@@ -11,6 +11,7 @@ namespace CoffeeMachine
         public CancellationToken CancellationToken { get; set; } = CancellationToken.None;
         public LanguageVersion CSharpLanguageVersion { get; set; } = LanguageVersion.Latest;
         public bool IndentWithSpaces { get; set; } = true;
+        public CodeKind ParseAs { get; set; } = CodeKind.Infer;
         public int SpacesPerIndent { get; set; } = 4;
         public bool TranslateCollectionTypes { get; set; } = true;
         public bool UseVarInDeclarations { get; set; } = true;

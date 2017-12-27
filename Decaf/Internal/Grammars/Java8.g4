@@ -321,6 +321,10 @@ classBody
 	:	'{' classBodyDeclaration* '}'
 	;
 
+classBodyDeclarations
+	:	classBodyDeclaration+
+	;
+
 classBodyDeclaration
 	:	classMemberDeclaration
 	|	instanceInitializer
