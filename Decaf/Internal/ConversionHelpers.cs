@@ -109,6 +109,51 @@ namespace CoffeeMachine.Internal
             return dotIndex == -1 ? javaTypeName : javaTypeName.Substring(dotIndex + 1);
         }
 
+        public static bool TryConvertToCSharpSpecialType(string javaTypeName, out string csharpTypeName)
+        {
+            javaTypeName = GetUnqualifiedTypeName(javaTypeName);
+            switch (javaTypeName)
+            {
+                case "boolean":
+                case "Boolean":
+                    csharpTypeName = "bool";
+                    break;
+                case "byte":
+                case "Byte":
+                    csharpTypeName = "byte";
+                    break;
+                case "char":
+                case "Character":
+                    csharpTypeName = "char";
+                    break;
+                case "double":
+                case "Double":
+                    csharpTypeName = "double";
+                    break;
+                case "float":
+                case "Float":
+                    csharpTypeName = "float";
+                    break;
+                case "int":
+                case "Integer":
+                    csharpTypeName = "int";
+                    break;
+                case "long":
+                case "Long":
+                    csharpTypeName = "long";
+                    break;
+                case "short":
+                case "Short":
+                    csharpTypeName = "short";
+                    break;
+                default:
+                    csharpTypeName = default;
+                    return false;
+            }
+
+            return true;
+        }
+
         private static string ConvertToPascalCase(string camelCase)
         {
             if (s_camelCaseToPascalCaseMap.TryGetValue(camelCase, out string pascalCase))

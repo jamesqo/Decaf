@@ -13,19 +13,19 @@ namespace CoffeeMachine.Internal
         {
             D.AssertTrue(_hasValue, "The channel is empty.");
 
-            T item = _value;
+            T value = _value;
             _value = default;
             _hasValue = false;
-            return item;
+            return value;
         }
 
         public T ReceiveOrDefault(T defaultValue) => _hasValue ? Receive() : defaultValue;
 
-        public void Send(T item)
+        public void Send(T value)
         {
-            D.AssertTrue(!_hasValue, "Channels can only hold one item at a time.");
+            D.AssertTrue(!_hasValue, "Channels can only hold one value at a time.");
 
-            _value = item;
+            _value = value;
             _hasValue = true;
         }
     }

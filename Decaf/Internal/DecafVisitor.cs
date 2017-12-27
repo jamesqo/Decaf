@@ -334,7 +334,33 @@ namespace CoffeeMachine.Internal
 
         #endregion
 
-        #region Local variables
+        #region Local variable declarations
+
+        public override Unit VisitLocalVariableDeclaration([NotNull] LocalVariableDeclarationContext context)
+        {
+            if (!_options.UseVarInDeclarations)
+            {
+                return base.VisitLocalVariableDeclaration(context);
+            }
+
+            var unannType = context.unannType();
+            string typeName = unannType.GetText();
+
+            this.VisitChildrenBefore(unannType, context);
+            MovePast(unannType);
+
+            if (TryConvertToCSharpSpecialType(typeName, out string csharpTypeName))
+            {
+                Write($" {csharpTypeName} ");
+            }
+            else
+            {
+                Write(" var ");
+            }
+
+            this.VisitChildrenAfter(unannType, context);
+            return default;
+        }
 
         public override Unit VisitLocalVariableFinalModifier([NotNull] LocalVariableFinalModifierContext context)
         {
@@ -353,7 +379,6 @@ namespace CoffeeMachine.Internal
             // typeParameters methodAnnotations result methodDeclarator throws_OrNot
             var typeParametersNode = context.typeParameters();
             var methodAnnotations = context.methodAnnotations();
-
 
             string typeParameters = default;
             RunAndRewind(() =>
@@ -594,18 +619,10 @@ namespace CoffeeMachine.Internal
         public override Unit VisitUnannClassOrInterfaceType([NotNull] UnannClassOrInterfaceTypeContext context)
         {
             string typeName = context.GetText();
-            string csharpTypeName;
 
-            switch (typeName)
+            if (!TryConvertToCSharpSpecialType(typeName, out string csharpTypeName))
             {
-                case "Object":
-                    csharpTypeName = "object";
-                    break;
-                case "String":
-                    csharpTypeName = "string";
-                    break;
-                default:
-                    return base.VisitUnannClassOrInterfaceType(context);
+                return base.VisitUnannClassOrInterfaceType(context);
             }
 
             MovePast(context);
