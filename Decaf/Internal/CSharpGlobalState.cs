@@ -24,12 +24,15 @@ namespace CoffeeMachine.Internal
         public HashSet<string> Usings => _usings;
         public HashSet<string> UsingStatics => _usingStatics;
 
-        public void AddAnonymousClass(string className, string classBody)
+        public string AddAnonymousClass(string className, string classBody)
         {
-            int suffix = 1;
-            while (!AddClass($"{className}{suffix}", classBody))
+            for (int suffix = 1; ; suffix++)
             {
-                suffix++;
+                string fullName = $"{className}{suffix}";
+                if (AddClass(fullName, classBody))
+                {
+                    return fullName;
+                }
             }
         }
 

@@ -270,19 +270,19 @@ namespace CoffeeMachine.Internal
 
             this.VisitChildrenBefore(identifierNode, context);
 
-            string baseClassName = default;
             string anonymousClassBody = default;
             RunAndRewind(() =>
             {
-                baseClassName = Record(() => Visit(identifierNode));
+                Visit(identifierNode);
                 this.VisitChildrenBetween(identifierNode, classBodyOrNot, context);
                 anonymousClassBody = Record(() => Visit(classBodyOrNot));
             });
 
             if (!string.IsNullOrEmpty(anonymousClassBody))
             {
+                string baseClassName = identifierNode.GetText();
                 string className = _options.FormatAnonymousClassName(baseClassName);
-                _gstate.AddAnonymousClass(className, anonymousClassBody);
+                className = _gstate.AddAnonymousClass(className, anonymousClassBody);
                 MovePast(identifierNode);
                 Write(className);
             }
