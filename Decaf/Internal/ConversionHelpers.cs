@@ -88,7 +88,7 @@ namespace CoffeeMachine.Internal
         }
 
         /// <summary>
-        /// Gets the name of the Java package that contains a Java type.
+        /// Gets the name of the Java package that contains a type.
         /// </summary>
         public static string GetPackageName(string javaTypeName)
         {
@@ -98,6 +98,15 @@ namespace CoffeeMachine.Internal
             D.AssertTrue(parts.Length > 0);
             Array.Resize(ref parts, parts.Length - 1);
             return string.Join('.', parts);
+        }
+
+        /// <summary>
+        /// Gets the unqualified name of a Java type.
+        /// </summary>
+        public static string GetUnqualifiedTypeName(string javaTypeName)
+        {
+            int dotIndex = javaTypeName.LastIndexOf('.');
+            return dotIndex == -1 ? javaTypeName : javaTypeName.Substring(dotIndex + 1);
         }
 
         private static string ConvertToPascalCase(string camelCase)

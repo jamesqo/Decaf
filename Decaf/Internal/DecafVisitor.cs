@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
@@ -31,56 +30,46 @@ namespace CoffeeMachine.Internal
         private readonly BrewOptions _options;
         private readonly ITokenStream _tokenStream;
         private readonly IParseTree _tree;
-        private RewindableState _state;
+        private readonly CSharpGlobalState _gstate;
+
+        private RewindableState _rstate;
 
         // These are mutable structs; do not make them readonly nor copy them.
         private Channel<string> _genericMethodHeaderChannel;
         private Channel<bool> _methodAnnotationChannel;
         private Channel<bool> _methodDeclarationChannel;
-        private Channel<string> _methodInvocationTypeArgumentsOrNotChannel;
-        private Channel<string> _methodTypeParametersChannel;
-
-        private readonly HashSet<string> _usings;
-        private readonly HashSet<string> _usingStatics;
-        private string _namespace;
 
         public DecafVisitor(BrewOptions options, ITokenStream tokenStream, IParseTree tree)
         {
             _options = options;
             _tokenStream = tokenStream;
             _tree = tree;
-            _state = new RewindableState
+            _gstate = new CSharpGlobalState();
+
+            _rstate = new RewindableState
             {
                 Output = new StringBuilder(),
                 TokenIndex = 0
             };
-
-            _usings = new HashSet<string>();
-            _usingStatics = new HashSet<string>();
-            _namespace = string.Empty;
         }
 
         public string GenerateCSharp()
         {
             Visit(_tree);
             return CSharpFormatter.Format(
-                csharpCode: _state.Output.ToString(),
-                withUsings: _usings,
-                withUsingStatics: _usingStatics,
-                withNamespace: _namespace,
+                csharpCode: _rstate.Output.ToString(),
+                state: _gstate,
                 options: _options);
         }
 
         #region Private helper methods
-
-        private bool AddUsing(string @namespace) => _usings.Add(@namespace);
 
         private void MovePast(ITerminalNode currentNode)
         {
             D.AssertNotNull(currentNode);
 
             ProcessHiddenTokensBefore(currentNode.Symbol);
-            _state.TokenIndex++;
+            _rstate.TokenIndex++;
         }
 
         private void MovePast(ParserRuleContext currentContext)
@@ -88,7 +77,7 @@ namespace CoffeeMachine.Internal
             D.AssertNotNull(currentContext);
 
             ProcessHiddenTokensBefore(currentContext.Start);
-            _state.TokenIndex += currentContext.DescendantTokenCount();
+            _rstate.TokenIndex += currentContext.DescendantTokenCount();
         }
 
         private void MovePast(IParseTree currentTree)
@@ -114,14 +103,14 @@ namespace CoffeeMachine.Internal
             D.AssertNotNull(hiddenToken);
 
             Write(hiddenToken.Text);
-            _state.TokenIndex++;
+            _rstate.TokenIndex++;
         }
 
         private void ProcessHiddenTokensBefore(IToken currentToken)
         {
             D.AssertNotNull(currentToken);
 
-            int start = _state.TokenIndex;
+            int start = _rstate.TokenIndex;
             int end = currentToken.TokenIndex;
 
             for (int i = start; i < end; i++)
@@ -130,19 +119,27 @@ namespace CoffeeMachine.Internal
             }
         }
 
-        private void RunAndRewind(Action action)
+        private string Record(Action action)
         {
-            var originalState = _state.Clone();
-            _state.ResetOutput();
+            var originalOutput = _rstate.Output;
+            _rstate.ResetOutput();
             action();
-            _state = originalState;
+            string result = _rstate.Output.ToString();
+            _rstate.Output = originalOutput;
+            return result;
         }
 
-        private void SetNamespace(string @namespace) => _namespace = @namespace;
+        private void RunAndRewind(Action action)
+        {
+            var originalState = _rstate.Clone();
+            _rstate.ResetOutput();
+            action();
+            _rstate = originalState;
+        }
 
         private void Write(string csharpText)
         {
-            _state.Output.Append(csharpText);
+            _rstate.Output.Append(csharpText);
         }
 
         #endregion
@@ -162,6 +159,9 @@ namespace CoffeeMachine.Internal
             // Reference: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/_keywords.html
             switch (node.Symbol.Type)
             {
+                case TokenConstants.Eof:
+                    // Don't write anything.
+                    break;
                 case BOOLEAN:
                     Write("bool");
                     break;
@@ -215,7 +215,7 @@ namespace CoffeeMachine.Internal
             // 'assert' expression ';'
             var expression = context.expression();
 
-            AddUsing("System.Diagnostics");
+            _gstate.AddUsing("System.Diagnostics");
 
             MovePast(context.GetChild(0));
             Write("Debug.Assert(");
@@ -231,7 +231,7 @@ namespace CoffeeMachine.Internal
             var expression1 = (ExpressionContext)context.GetChild(1);
             var expression2 = (ExpressionContext)context.GetChild(3);
 
-            AddUsing("System.Diagnostics");
+            _gstate.AddUsing("System.Diagnostics");
 
             MovePast(context.GetChild(0));
             Write("Debug.Assert(");
@@ -246,6 +246,64 @@ namespace CoffeeMachine.Internal
 
         #endregion
 
+        #region Class declarations
+
+        public override Unit VisitClassInstanceCreationExpression([NotNull] ClassInstanceCreationExpressionContext context)
+        {
+            return CommonVisitClassInstanceCreationExpression(context);
+        }
+
+        public override Unit VisitClassInstanceCreationExpression_lf_primary([NotNull] ClassInstanceCreationExpression_lf_primaryContext context)
+        {
+            return CommonVisitClassInstanceCreationExpression(context);
+        }
+
+        public override Unit VisitClassInstanceCreationExpression_lfno_primary([NotNull] ClassInstanceCreationExpression_lfno_primaryContext context)
+        {
+            return CommonVisitClassInstanceCreationExpression(context);
+        }
+
+        private Unit CommonVisitClassInstanceCreationExpression(ParserRuleContext context)
+        {
+            var identifierNode = context.GetFirstToken(Identifier);
+            var classBodyOrNot = context.GetFirstChild<AnonymousClassBodyOrNotContext>();
+
+            this.VisitChildrenBefore(identifierNode, context);
+
+            string anonymousClassBody = default;
+            RunAndRewind(() =>
+            {
+                Visit(identifierNode);
+                this.VisitChildrenBetween(identifierNode, classBodyOrNot, context);
+                anonymousClassBody = Record(() => Visit(classBodyOrNot));
+            });
+
+            if (!string.IsNullOrEmpty(anonymousClassBody))
+            {
+                string baseClassName = GetUnqualifiedTypeName(identifierNode.GetText());
+                string className = _options.FormatAnonymousClassName(baseClassName);
+                className = _gstate.AddAnonymousClass(className, new CSharpClassInfo
+                {
+                    BaseTypes = new[] { baseClassName },
+                    Body = anonymousClassBody,
+                    Modifiers = new[] { "internal" }
+                });
+
+                MovePast(identifierNode);
+                Write(className);
+            }
+            else
+            {
+                Visit(identifierNode);
+            }
+
+            this.VisitChildrenBetween(identifierNode, classBodyOrNot, context);
+            MovePast(classBodyOrNot);
+            return default;
+        }
+
+        #endregion
+
         #region Import declarations
 
         public override Unit VisitSingleTypeImportDeclaration([NotNull] SingleTypeImportDeclarationContext context)
@@ -255,7 +313,7 @@ namespace CoffeeMachine.Internal
 
             string packageName = GetPackageName(typeName);
             string namespaceName = ConvertPackageName(packageName);
-            AddUsing(namespaceName);
+            _gstate.AddUsing(namespaceName);
 
             MovePast(context);
             return default;
@@ -268,7 +326,7 @@ namespace CoffeeMachine.Internal
             string packageName = context.packageOrTypeName().GetText();
 
             string namespaceName = ConvertPackageName(packageName);
-            AddUsing(namespaceName);
+            _gstate.AddUsing(namespaceName);
 
             MovePast(context);
             return default;
@@ -292,17 +350,18 @@ namespace CoffeeMachine.Internal
 
         public override Unit VisitGenericMethodHeader([NotNull] GenericMethodHeaderContext context)
         {
-            // methodTypeParameters methodAnnotations result methodDeclarator throws_OrNot
-            var methodTypeParameters = context.methodTypeParameters();
+            // typeParameters methodAnnotations result methodDeclarator throws_OrNot
+            var typeParametersNode = context.typeParameters();
             var methodAnnotations = context.methodAnnotations();
 
+
+            string typeParameters = default;
             RunAndRewind(() =>
             {
-                Visit(methodTypeParameters);
+                typeParameters = Record(() => Visit(typeParametersNode));
                 Visit(methodAnnotations);
             });
 
-            string typeParameters = _methodTypeParametersChannel.Receive();
             bool hasOverrideAnnotation = _methodDeclarationChannel.Receive() || _methodAnnotationChannel.ReceiveOrDefault(false);
 
             _genericMethodHeaderChannel.Send(typeParameters);
@@ -311,7 +370,7 @@ namespace CoffeeMachine.Internal
                 Write(" override ");
             }
 
-            MovePast(methodTypeParameters);
+            MovePast(typeParametersNode);
             MovePast(methodAnnotations);
             this.VisitChildrenAfter(methodAnnotations, context);
             return default;
@@ -319,11 +378,7 @@ namespace CoffeeMachine.Internal
 
         public override Unit VisitMethodAnnotation([NotNull] MethodAnnotationContext context)
         {
-            if (context.GetText() == "@Override")
-            {
-                _methodAnnotationChannel.Send(true);
-            }
-
+            _methodAnnotationChannel.Send(context.GetText() == "@Override");
             return base.VisitMethodAnnotation(context);
         }
 
@@ -350,13 +405,6 @@ namespace CoffeeMachine.Internal
             Visit(identifierNode);
             Write(typeParameters);
             this.VisitChildrenAfter(identifierNode, context);
-            return default;
-        }
-
-        public override Unit VisitMethodTypeParameters([NotNull] MethodTypeParametersContext context)
-        {
-            Visit(context.typeParameters());
-            _methodTypeParametersChannel.Send(_state.Output.ToString());
             return default;
         }
 
@@ -397,7 +445,7 @@ namespace CoffeeMachine.Internal
 
         #endregion
 
-        #region Method invocations
+        #region Method references
 
         public override Unit VisitSimpleMethodInvocation([NotNull] SimpleMethodInvocationContext context)
         {
@@ -451,8 +499,8 @@ namespace CoffeeMachine.Internal
 
         private Unit CommonVisitNotSoSimpleMethodInvocation(ParserRuleContext context)
         {
-            var typeArgumentsOrNot = context.GetFirstChild<MethodInvocationTypeArgumentsOrNotContext>();
-            var typeArgumentsNode = typeArgumentsOrNot.typeArgumentsOrNot().typeArguments();
+            var typeArgumentsOrNot = context.GetFirstChild<TypeArgumentsOrNotContext>();
+            var typeArgumentsNode = typeArgumentsOrNot.typeArguments();
             var identifierNode = context.GetFirstToken(Identifier);
             string methodName = identifierNode.GetText();
             var lparen = context.GetFirstToken(LPAREN);
@@ -469,21 +517,11 @@ namespace CoffeeMachine.Internal
 
             string csharpMethodName = ConvertMethodName(methodName);
 
-            RunAndRewind(() => Visit(typeArgumentsOrNot));
-            string typeArguments = _methodInvocationTypeArgumentsOrNotChannel.Receive();
-
-            MovePast(typeArgumentsOrNot);
+            string typeArguments = Record(() => Visit(typeArgumentsOrNot));
             MovePast(identifierNode);
             Write(csharpMethodName);
             Write(typeArguments);
             this.VisitChildrenAfter(identifierNode, context);
-            return default;
-        }
-
-        public override Unit VisitMethodInvocationTypeArgumentsOrNot([NotNull] MethodInvocationTypeArgumentsOrNotContext context)
-        {
-            Visit(context.typeArgumentsOrNot());
-            _methodInvocationTypeArgumentsOrNotChannel.Send(_state.Output.ToString());
             return default;
         }
 
@@ -539,7 +577,7 @@ namespace CoffeeMachine.Internal
             string packageName = context.packageName().GetText();
 
             string namespaceName = ConvertPackageName(packageName);
-            SetNamespace(namespaceName);
+            _gstate.SetNamespace(namespaceName);
 
             MovePast(context);
             return default;

@@ -21,13 +21,19 @@
   </ItemGroup>
   
   <ItemGroup>
-    <Compile Update="Internal\Channel.cs">
+    <Compile Update="Internal\CSharpClassInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Internal\CSharpConstants.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Internal\ConversionHelpers.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Internal\CSharpFormatter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Internal\CSharpGlobalState.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Internal\Diagnostics\D.cs">
@@ -40,6 +46,12 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Internal\Messenger.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Internal\RoslynHelpers.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Internal\Television.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

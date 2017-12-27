@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using CoffeeMachine.Internal.Diagnostics;
 using Microsoft.CodeAnalysis;
@@ -13,17 +14,53 @@ namespace CoffeeMachine.Internal
     {
         public static string Format(
             string csharpCode,
-            HashSet<string> withUsings,
-            HashSet<string> withUsingStatics,
-            string withNamespace,
+            CSharpGlobalState state,
             BrewOptions options)
         {
-            var tree = CSharpSyntaxTree.ParseText(csharpCode, options.GetCSharpParseOptions());
+            var parseOptions = options.GetCSharpParseOptions();
+            var tree = CSharpSyntaxTree.ParseText(csharpCode, parseOptions);
             var root = tree.GetCompilationUnitRoot(options.CancellationToken);
-            root = AddUsings(root, withUsings, withUsingStatics);
-            root = AddNamespace(root, withNamespace);
+
+            root = AddClasses(root, state.Classes, parseOptions);
+            root = AddNamespace(root, state.Namespace);
+            root = AddUsings(root, state.Usings, state.UsingStatics);
             root = root.WithAdditionalAnnotations(Formatter.Annotation, Simplifier.Annotation).NormalizeWhitespace();
             return root.ToFullString();
+        }
+
+        private static CompilationUnitSyntax AddClasses(CompilationUnitSyntax root, Dictionary<string, CSharpClassInfo> classes, CSharpParseOptions options)
+        {
+            return root.AddMembers(classes.Select(CreateClassDeclaration).ToArray());
+
+            ClassDeclarationSyntax CreateClassDeclaration(KeyValuePair<string, CSharpClassInfo> pair)
+            {
+                var (name, info) = pair;
+                string baseTypes = string.Join(", ", info.BaseTypes);
+                string modifiers = string.Join(" ", info.Modifiers);
+                string text = $"{modifiers} class {name} : {baseTypes} {info.Body}";
+                return RoslynHelpers.ParseClassDeclaration(text, options);
+            }
+        }
+
+        private static CompilationUnitSyntax AddNamespace(CompilationUnitSyntax root, string @namespace)
+        {
+            if (string.IsNullOrEmpty(@namespace))
+            {
+                return root;
+            }
+
+            return root.WithMembers(
+                SyntaxFactory.SingletonList<MemberDeclarationSyntax>(
+                    CreateNamespaceDeclaration(@namespace, root.Members)));
+
+            NamespaceDeclarationSyntax CreateNamespaceDeclaration(string name, SyntaxList<MemberDeclarationSyntax> members)
+            {
+                return SyntaxFactory.NamespaceDeclaration(
+                    SyntaxFactory.IdentifierName(name),
+                    externs: default,
+                    usings: default,
+                    members);
+            }
         }
 
         private static CompilationUnitSyntax AddUsings(CompilationUnitSyntax root, HashSet<string> usings, HashSet<string> usingStatics)
@@ -46,27 +83,6 @@ namespace CoffeeMachine.Internal
                     SyntaxFactory.Token(SyntaxKind.StaticKeyword),
                     alias: null,
                     SyntaxFactory.IdentifierName(@namespace));
-            }
-        }
-
-        private static CompilationUnitSyntax AddNamespace(CompilationUnitSyntax root, string @namespace)
-        {
-            if (string.IsNullOrEmpty(@namespace))
-            {
-                return root;
-            }
-
-            return root.WithMembers(
-                SyntaxFactory.SingletonList<MemberDeclarationSyntax>(
-                    CreateNamespaceDeclaration(@namespace, root.Members)));
-
-            NamespaceDeclarationSyntax CreateNamespaceDeclaration(string name, SyntaxList<MemberDeclarationSyntax> members)
-            {
-                return SyntaxFactory.NamespaceDeclaration(
-                    SyntaxFactory.IdentifierName(name),
-                    externs: default,
-                    usings: default,
-                    members);
             }
         }
     }

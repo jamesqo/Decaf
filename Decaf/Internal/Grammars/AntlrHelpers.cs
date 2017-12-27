@@ -70,5 +70,23 @@ namespace CoffeeMachine.Internal.Grammars
                 visitor.Visit(child);
             }
         }
+
+        public static void VisitChildrenBetween(this AbstractParseTreeVisitor<Unit> visitor, IParseTree start, IParseTree stop, IParseTree parent)
+        {
+            D.AssertEqual(start.Parent, parent);
+            D.AssertEqual(stop.Parent, parent);
+
+            int childCount = parent.ChildCount;
+            for (int i = parent.FindChild(start) + 1; i < childCount; i++)
+            {
+                var child = parent.GetChild(i);
+                if (child == stop)
+                {
+                    return;
+                }
+
+                visitor.Visit(child);
+            }
+        }
     }
 }
