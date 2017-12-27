@@ -177,10 +177,6 @@ typeArgumentsOrNot
 	:	typeArguments?
 	;
 
-methodInvocationTypeArgumentsOrNot
-	:	typeArgumentsOrNot
-	;
-
 typeArgumentList
 	:	typeArgument (',' typeArgument)*
 	;
@@ -467,11 +463,7 @@ nonGenericMethodHeader
 	;
 
 genericMethodHeader
-	:	methodTypeParameters methodAnnotations result methodDeclarator throws_OrNot
-	;
-
-methodTypeParameters
-	:	typeParameters
+	:	typeParameters methodAnnotations result methodDeclarator throws_OrNot
 	;
 
 methodAnnotations
@@ -1178,15 +1170,15 @@ simpleMethodInvocation
 	;
 
 notSoSimpleMethodInvocation
-	:	typeName '.' methodInvocationTypeArgumentsOrNot Identifier '(' argumentListOrNot ')'
-	|	expressionName '.' methodInvocationTypeArgumentsOrNot Identifier '(' argumentListOrNot ')'
-	|	primary '.' methodInvocationTypeArgumentsOrNot Identifier '(' argumentListOrNot ')'
-	|	'super' '.' methodInvocationTypeArgumentsOrNot Identifier '(' argumentListOrNot ')'
-	|	typeName '.' 'super' '.' methodInvocationTypeArgumentsOrNot Identifier '(' argumentListOrNot ')'
+	:	typeName '.' typeArgumentsOrNot Identifier '(' argumentListOrNot ')'
+	|	expressionName '.' typeArgumentsOrNot Identifier '(' argumentListOrNot ')'
+	|	primary '.' typeArgumentsOrNot Identifier '(' argumentListOrNot ')'
+	|	'super' '.' typeArgumentsOrNot Identifier '(' argumentListOrNot ')'
+	|	typeName '.' 'super' '.' typeArgumentsOrNot Identifier '(' argumentListOrNot ')'
 	;
 
 methodInvocation_lf_primary
-	:	'.' methodInvocationTypeArgumentsOrNot Identifier '(' argumentListOrNot ')'
+	:	'.' typeArgumentsOrNot Identifier '(' argumentListOrNot ')'
 	;
 
 methodInvocation_lfno_primary
@@ -1199,10 +1191,10 @@ simpleMethodInvocation_lfno_primary
 	;
 
 notSoSimpleMethodInvocation_lfno_primary
-	:	typeName '.' methodInvocationTypeArgumentsOrNot Identifier '(' argumentListOrNot ')'
-	|	expressionName '.' methodInvocationTypeArgumentsOrNot Identifier '(' argumentListOrNot ')'
-	|	'super' '.' methodInvocationTypeArgumentsOrNot Identifier '(' argumentListOrNot ')'
-	|	typeName '.' 'super' '.' methodInvocationTypeArgumentsOrNot Identifier '(' argumentListOrNot ')'
+	:	typeName '.' typeArgumentsOrNot Identifier '(' argumentListOrNot ')'
+	|	expressionName '.' typeArgumentsOrNot Identifier '(' argumentListOrNot ')'
+	|	'super' '.' typeArgumentsOrNot Identifier '(' argumentListOrNot ')'
+	|	typeName '.' 'super' '.' typeArgumentsOrNot Identifier '(' argumentListOrNot ')'
 	;
 
 argumentList

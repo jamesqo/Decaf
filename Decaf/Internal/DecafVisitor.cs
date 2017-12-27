@@ -35,12 +35,9 @@ namespace CoffeeMachine.Internal
         private RewindableState _rstate;
 
         // These are mutable structs; do not make them readonly nor copy them.
-        private Channel<string> _anonymousClassBodyOrNotChannel;
         private Channel<string> _genericMethodHeaderChannel;
         private Channel<bool> _methodAnnotationChannel;
         private Channel<bool> _methodDeclarationChannel;
-        private Channel<string> _methodInvocationTypeArgumentsOrNotChannel;
-        private Channel<string> _methodTypeParametersChannel;
 
         public DecafVisitor(BrewOptions options, ITokenStream tokenStream, IParseTree tree)
         {
@@ -122,12 +119,32 @@ namespace CoffeeMachine.Internal
             }
         }
 
-        private void RunAndRewind(Action action)
+        private string Record(Action action)
+        {
+            var tempState = RunAndRewind(action);
+            string result = tempState.Output.ToString();
+            tempState.Output = _rstate.Output;
+            _rstate = tempState;
+            return result;
+        }
+
+        /*
+        private string RecordAndRewind(Action action)
+        {
+            var tempState = RunAndRewind(action);
+            return tempState.Output.ToString();
+        }
+        */
+
+        private RewindableState RunAndRewind(Action action)
         {
             var originalState = _rstate.Clone();
             _rstate.ResetOutput();
             action();
+
+            var tempState = _rstate;
             _rstate = originalState;
+            return tempState;
         }
 
         private void Write(string csharpText)
@@ -238,14 +255,6 @@ namespace CoffeeMachine.Internal
 
         #region Class declarations
 
-        public override Unit VisitAnonymousClassBodyOrNot([NotNull] AnonymousClassBodyOrNotContext context)
-        {
-            var classBody = context.classBody();
-
-            _anonymousClassBodyOrNotChannel.Send(classBody?.GetText() ?? string.Empty);
-            return default;
-        }
-
         public override Unit VisitClassInstanceCreationExpression([NotNull] ClassInstanceCreationExpressionContext context)
         {
             return CommonVisitClassInstanceCreationExpression(context);
@@ -268,14 +277,13 @@ namespace CoffeeMachine.Internal
 
             this.VisitChildrenBefore(identifierNode, context);
 
+            string anonymousClassBody = default;
             RunAndRewind(() =>
             {
                 Visit(identifierNode);
                 this.VisitChildrenBetween(identifierNode, classBodyOrNot, context);
-                Visit(classBodyOrNot);
+                anonymousClassBody = Record(() => Visit(classBodyOrNot));
             });
-
-            string anonymousClassBody = _anonymousClassBodyOrNotChannel.Receive();
 
             if (!string.IsNullOrEmpty(anonymousClassBody))
             {
@@ -341,17 +349,18 @@ namespace CoffeeMachine.Internal
 
         public override Unit VisitGenericMethodHeader([NotNull] GenericMethodHeaderContext context)
         {
-            // methodTypeParameters methodAnnotations result methodDeclarator throws_OrNot
-            var methodTypeParameters = context.methodTypeParameters();
+            // typeParameters methodAnnotations result methodDeclarator throws_OrNot
+            var typeParametersNode = context.typeParameters();
             var methodAnnotations = context.methodAnnotations();
 
+
+            string typeParameters = default;
             RunAndRewind(() =>
             {
-                Visit(methodTypeParameters);
+                typeParameters = Record(() => Visit(typeParametersNode));
                 Visit(methodAnnotations);
             });
 
-            string typeParameters = _methodTypeParametersChannel.Receive();
             bool hasOverrideAnnotation = _methodDeclarationChannel.Receive() || _methodAnnotationChannel.ReceiveOrDefault(false);
 
             _genericMethodHeaderChannel.Send(typeParameters);
@@ -360,7 +369,7 @@ namespace CoffeeMachine.Internal
                 Write(" override ");
             }
 
-            MovePast(methodTypeParameters);
+            MovePast(typeParametersNode);
             MovePast(methodAnnotations);
             this.VisitChildrenAfter(methodAnnotations, context);
             return default;
@@ -395,13 +404,6 @@ namespace CoffeeMachine.Internal
             Visit(identifierNode);
             Write(typeParameters);
             this.VisitChildrenAfter(identifierNode, context);
-            return default;
-        }
-
-        public override Unit VisitMethodTypeParameters([NotNull] MethodTypeParametersContext context)
-        {
-            Visit(context.typeParameters());
-            _methodTypeParametersChannel.Send(_rstate.Output.ToString());
             return default;
         }
 
@@ -496,8 +498,8 @@ namespace CoffeeMachine.Internal
 
         private Unit CommonVisitNotSoSimpleMethodInvocation(ParserRuleContext context)
         {
-            var typeArgumentsOrNot = context.GetFirstChild<MethodInvocationTypeArgumentsOrNotContext>();
-            var typeArgumentsNode = typeArgumentsOrNot.typeArgumentsOrNot().typeArguments();
+            var typeArgumentsOrNot = context.GetFirstChild<TypeArgumentsOrNotContext>();
+            var typeArgumentsNode = typeArgumentsOrNot.typeArguments();
             var identifierNode = context.GetFirstToken(Identifier);
             string methodName = identifierNode.GetText();
             var lparen = context.GetFirstToken(LPAREN);
@@ -514,21 +516,11 @@ namespace CoffeeMachine.Internal
 
             string csharpMethodName = ConvertMethodName(methodName);
 
-            RunAndRewind(() => Visit(typeArgumentsOrNot));
-            string typeArguments = _methodInvocationTypeArgumentsOrNotChannel.Receive();
-
-            MovePast(typeArgumentsOrNot);
+            string typeArguments = Record(() => Visit(typeArgumentsOrNot));
             MovePast(identifierNode);
             Write(csharpMethodName);
             Write(typeArguments);
             this.VisitChildrenAfter(identifierNode, context);
-            return default;
-        }
-
-        public override Unit VisitMethodInvocationTypeArgumentsOrNot([NotNull] MethodInvocationTypeArgumentsOrNotContext context)
-        {
-            Visit(context.typeArgumentsOrNot());
-            _methodInvocationTypeArgumentsOrNotChannel.Send(_rstate.Output.ToString());
             return default;
         }
 
