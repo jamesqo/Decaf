@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using CoffeeMachine.Internal.Diagnostics;
 using Microsoft.CodeAnalysis;
@@ -17,18 +16,43 @@ namespace CoffeeMachine.Internal
             CSharpGlobalState state,
             BrewOptions options)
         {
-            var parseOptions = options.GetCSharpParseOptions();
-            var tree = CSharpSyntaxTree.ParseText(csharpCode, parseOptions);
-            var root = tree.GetCompilationUnitRoot(options.CancellationToken);
+            var root = ParseCSharp(csharpCode, options);
 
-            root = AddClasses(root, state.Classes, parseOptions);
-            root = AddNamespace(root, state.Namespace);
-            root = AddUsings(root, state.Usings, state.UsingStatics);
+            if (root is CompilationUnitSyntax cuRoot)
+            {
+                var parseOptions = options.GetCSharpParseOptions();
+                cuRoot = AddClasses(cuRoot, state.Classes, parseOptions);
+                cuRoot = AddNamespace(cuRoot, state.Namespace);
+                cuRoot = AddUsings(cuRoot, state.Usings, state.UsingStatics);
+            }
+
             root = root.WithAdditionalAnnotations(Formatter.Annotation, Simplifier.Annotation).NormalizeWhitespace();
             return root.ToFullString();
         }
 
-        private static CompilationUnitSyntax AddClasses(CompilationUnitSyntax root, Dictionary<string, CSharpClassInfo> classes, CSharpParseOptions options)
+        private static SyntaxNode ParseCSharp(string code, BrewOptions options)
+        {
+            D.AssertTrue(options.ParseAs != CodeKind.Infer, $"Update {nameof(options)} to reflect the kind of code that was parsed.");
+
+            var parseOptions = options.GetCSharpParseOptions();
+            switch (options.ParseAs)
+            {
+                case CodeKind.CompilationUnit:
+                case CodeKind.ClassBody:
+                case CodeKind.MethodBody:
+                    return SyntaxFactory.ParseCompilationUnit(code, options: parseOptions);
+                case CodeKind.Expression:
+                    return SyntaxFactory.ParseExpression(code, options: parseOptions, consumeFullText: true);
+                default:
+                    D.Fail($"Unrecognized {nameof(CodeKind)} value: {options.ParseAs}");
+                    return default;
+            }
+        }
+
+        private static CompilationUnitSyntax AddClasses(
+            CompilationUnitSyntax root,
+            Dictionary<string, CSharpClassInfo> classes,
+            CSharpParseOptions options)
         {
             return root.AddMembers(classes.Select(CreateClassDeclaration).ToArray());
 
@@ -53,7 +77,9 @@ namespace CoffeeMachine.Internal
                 SyntaxFactory.SingletonList<MemberDeclarationSyntax>(
                     CreateNamespaceDeclaration(@namespace, root.Members)));
 
-            NamespaceDeclarationSyntax CreateNamespaceDeclaration(string name, SyntaxList<MemberDeclarationSyntax> members)
+            NamespaceDeclarationSyntax CreateNamespaceDeclaration(
+                string name,
+                SyntaxList<MemberDeclarationSyntax> members)
             {
                 return SyntaxFactory.NamespaceDeclaration(
                     SyntaxFactory.IdentifierName(name),
@@ -63,7 +89,10 @@ namespace CoffeeMachine.Internal
             }
         }
 
-        private static CompilationUnitSyntax AddUsings(CompilationUnitSyntax root, HashSet<string> usings, HashSet<string> usingStatics)
+        private static CompilationUnitSyntax AddUsings(
+            CompilationUnitSyntax root,
+            HashSet<string> usings,
+            HashSet<string> usingStatics)
         {
             D.AssertTrue(!root.Usings.Any(), "The generated C# code shouldn't have usings right after it is translated from Java.");
 

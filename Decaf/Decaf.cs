@@ -24,7 +24,7 @@ namespace CoffeeMachine
             options = options ?? BrewOptions.Default;
 
             var pipeline = BuildPipeline(javaCode);
-            var tree = GetParseTree(pipeline.Parser, options);
+            var tree = GetTree(pipeline.Parser, options);
             return new DecafVisitor(options, pipeline.TokenStream, tree).GenerateCSharp();
         }
 
@@ -38,7 +38,7 @@ namespace CoffeeMachine
             return pipeline;
         }
 
-        private static IParseTree GetParseTree(Java8Parser parser, BrewOptions options)
+        private static IParseTree GetTree(Java8Parser parser, BrewOptions options)
         {
             switch (options.ParseAs)
             {

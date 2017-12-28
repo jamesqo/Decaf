@@ -1,4 +1,5 @@
 ﻿using System.Threading;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
 namespace CoffeeMachine
@@ -23,7 +24,9 @@ namespace CoffeeMachine
 
         internal CSharpParseOptions GetCSharpParseOptions()
         {
-            return new CSharpParseOptions(CSharpLanguageVersion);
+            return new CSharpParseOptions(
+                languageVersion: CSharpLanguageVersion,
+                kind: SourceCodeKind.Script);
         }
     }
 }

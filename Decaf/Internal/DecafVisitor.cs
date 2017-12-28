@@ -51,6 +51,31 @@ namespace CoffeeMachine.Internal
                 Output = new StringBuilder(),
                 TokenIndex = 0
             };
+
+            if (options.ParseAs == CodeKind.Infer)
+            {
+                options.ParseAs = GetCodeKind((CodeSnippetContext)tree);
+            }
+        }
+
+        private static CodeKind GetCodeKind(CodeSnippetContext context)
+        {
+            // codeSnippet : compilationUnit | classBodyDeclarations | blockStatements | expression
+            var child = (RuleContext)context.GetChild(0);
+            switch (child.RuleIndex)
+            {
+                case RULE_compilationUnit:
+                    return CodeKind.CompilationUnit;
+                case RULE_classBodyDeclarations:
+                    return CodeKind.ClassBody;
+                case RULE_blockStatements:
+                    return CodeKind.MethodBody;
+                case RULE_expression:
+                    return CodeKind.Expression;
+                default:
+                    D.Fail($"Unrecognized rule index: {child.RuleIndex}");
+                    return default;
+            }
         }
 
         public string GenerateCSharp()
