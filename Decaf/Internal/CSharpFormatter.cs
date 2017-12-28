@@ -20,8 +20,7 @@ namespace CoffeeMachine.Internal
 
             if (root is CompilationUnitSyntax cuRoot)
             {
-                var parseOptions = options.GetCSharpParseOptions();
-                cuRoot = AddClasses(cuRoot, state.Classes, parseOptions);
+                cuRoot = AddClasses(cuRoot, state.Classes, options);
                 cuRoot = AddNamespace(cuRoot, state.Namespace);
                 cuRoot = AddUsings(cuRoot, state.Usings, state.UsingStatics);
                 root = cuRoot;
@@ -53,7 +52,7 @@ namespace CoffeeMachine.Internal
         private static CompilationUnitSyntax AddClasses(
             CompilationUnitSyntax root,
             Dictionary<string, CSharpClassInfo> classes,
-            CSharpParseOptions options)
+            BrewOptions options)
         {
             return root.AddMembers(classes.Select(CreateClassDeclaration).ToArray());
 
@@ -63,7 +62,7 @@ namespace CoffeeMachine.Internal
                 string baseTypes = string.Join(", ", info.BaseTypes);
                 string modifiers = string.Join(" ", info.Modifiers);
                 string text = $"{modifiers} class {name} : {baseTypes} {info.Body}";
-                return RoslynHelpers.ParseClassDeclaration(text, options);
+                return RoslynHelpers.ParseClassDeclaration(text, options.GetCSharpParseOptions());
             }
         }
 
