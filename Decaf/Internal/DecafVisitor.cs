@@ -200,7 +200,7 @@ namespace CoffeeMachine.Internal
                     Write("readonly");
                     break;
                 case Identifier:
-                    string identifier = EscapeIdentifierForCSharp(node.GetText());
+                    string identifier = ConvertIdentifier(node.GetText());
                     Write(identifier);
                     break;
                 case IMPLEMENTS:
@@ -648,14 +648,25 @@ namespace CoffeeMachine.Internal
 
         #region Type references
 
+        public override Unit VisitExpressionName([NotNull] ExpressionNameContext context)
+        {
+            return CommonVisitTypeName(context);
+        }
+
+        public override Unit VisitTypeName([NotNull] TypeNameContext context)
+        {
+            return CommonVisitTypeName(context);
+        }
+
         public override Unit VisitUnannClassOrInterfaceType([NotNull] UnannClassOrInterfaceTypeContext context)
         {
-            string typeName = context.GetText();
+            return CommonVisitTypeName(context);
+        }
 
-            if (!TryConvertToCSharpSpecialType(typeName, out string csharpTypeName))
-            {
-                return base.VisitUnannClassOrInterfaceType(context);
-            }
+        private Unit CommonVisitTypeName(ParserRuleContext context)
+        {
+            string typeName = context.GetText();
+            string csharpTypeName = ConvertTypeName(typeName);
 
             MovePast(context);
             Write(csharpTypeName);

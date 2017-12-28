@@ -68,6 +68,19 @@ namespace CoffeeMachine.Internal
         }
 
         /// <summary>
+        /// Converts a Java identifier to a C# identifier.
+        /// </summary>
+        public static string ConvertIdentifier(string javaIdentifier)
+        {
+            string csharpIdentifier = javaIdentifier;
+            // Don't convert from camelCase to PascalCase here. It's not always desirable, e.g. in the case of
+            // local variables or parameters.
+            csharpIdentifier = YellCaseToPascalCase(csharpIdentifier);
+            csharpIdentifier = EscapeCSharpIdentifier(csharpIdentifier);
+            return csharpIdentifier;
+        }
+
+        /// <summary>
         /// Converts a Java method name to a C# method name.
         /// </summary>
         public static string ConvertMethodName(string javaMethodName)
@@ -75,25 +88,32 @@ namespace CoffeeMachine.Internal
             D.AssertTrue(!string.IsNullOrEmpty(javaMethodName));
             D.AssertTrue(!javaMethodName.Contains("."));
 
-            return ConvertToPascalCase(javaMethodName);
+            return ToPascalCase(javaMethodName);
         }
 
         /// <summary>
         /// Converts a Java package name to a C# namespace name.
         /// </summary>
-        public static string ConvertPackageName(string javaPackageName)
+        public static string ConvertPackageName(string packageName)
         {
-            D.AssertTrue(!string.IsNullOrEmpty(javaPackageName));
-
-            return string.Join('.', javaPackageName.Split('.').Select(ConvertToPascalCase));
+            string[] parts = packageName.Split('.', StringSplitOptions.RemoveEmptyEntries);
+            return string.Join('.', parts.Select(ToPascalCase));
         }
 
         /// <summary>
-        /// Escapes a reserved identifier so that it is a valid C# identifier.
+        /// Converts a Java type name to a C# type name.
         /// </summary>
-        public static string EscapeIdentifierForCSharp(string identifier)
+        public static string ConvertTypeName(string javaTypeName)
         {
-            return IsCSharpKeyword(identifier) ? '@' + identifier : identifier;
+            if (TryConvertToCSharpSpecialType(javaTypeName, out string csharpTypeName))
+            {
+                return csharpTypeName;
+            }
+
+            string packageName = GetPackageName(javaTypeName);
+            string namespaceName = ConvertPackageName(packageName);
+            string csharpUnqualifiedTypeName = ToPascalCase(GetUnqualifiedTypeName(javaTypeName));
+            return namespaceName + '.' + csharpUnqualifiedTypeName;
         }
 
         /// <summary>
@@ -103,7 +123,7 @@ namespace CoffeeMachine.Internal
         {
             D.AssertTrue(!string.IsNullOrEmpty(javaTypeName));
 
-            string[] parts = javaTypeName.Split('.');
+            string[] parts = javaTypeName.Split('.', StringSplitOptions.RemoveEmptyEntries);
             D.AssertTrue(parts.Length > 0);
             Array.Resize(ref parts, parts.Length - 1);
             return string.Join('.', parts);
@@ -163,20 +183,80 @@ namespace CoffeeMachine.Internal
             return true;
         }
 
-        private static string ConvertToPascalCase(string camelCase)
+        /// <summary>
+        /// Converts camelCase text to PascalCase text.
+        /// </summary>
+        private static string CamelCaseToPascalCase(string text)
         {
-            if (s_camelCaseToPascalCaseMap.TryGetValue(camelCase, out string pascalCase))
+            if (s_camelCaseToPascalCaseMap.TryGetValue(text, out string pascalCase))
             {
                 return pascalCase;
             }
 
-            char newFirstChar = char.ToUpperInvariant(camelCase[0]);
-            return newFirstChar + camelCase.Substring(1);
+            char newFirstChar = char.ToUpperInvariant(text[0]);
+            return newFirstChar + text.Substring(1);
+        }
+
+        /// <summary>
+        /// Converts YELL_CASE text to PascalCase text.
+        /// </summary>
+        private static string YellCaseToPascalCase(string text)
+        {
+            if (!IsYellCase(text))
+            {
+                return text;
+            }
+
+            string[] words = text.Split('_', StringSplitOptions.RemoveEmptyEntries);
+            return string.Concat(words.Select(UppercaseToPascalCase));
+
+            string UppercaseToPascalCase(string word)
+            {
+                D.AssertTrue(IsYellCase(word));
+
+                char[] buffer = word.ToCharArray();
+                for (int i = 1; i < word.Length; i++)
+                {
+                    buffer[i] = char.ToLowerInvariant(buffer[i]);
+                }
+                return new string(buffer);
+            }
+        }
+
+        private static string ToPascalCase(string text)
+        {
+            return YellCaseToPascalCase(CamelCaseToPascalCase(text));
+        }
+
+        /// <summary>
+        /// Escapes a reserved identifier so that it is a valid C# identifier.
+        /// </summary>
+        private static string EscapeCSharpIdentifier(string identifier)
+        {
+            return IsCSharpKeyword(identifier) ? '@' + identifier : identifier;
         }
 
         private static bool IsCSharpKeyword(string text)
         {
             return SyntaxFacts.GetKeywordKind(text) != SyntaxKind.None;
+        }
+
+        /// <summary>
+        /// Returns whether a string is YELL_CASE.
+        /// </summary>
+        private static bool IsYellCase(string text)
+        {
+            foreach (char ch in text)
+            {
+                // Don't use char.IsUpper because it returns false for digits, but text like 'ROTATION_90'
+                // should be recognized as yell-case.
+                if (ch != '_' && ch != char.ToUpperInvariant(ch))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }
