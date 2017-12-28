@@ -52,8 +52,11 @@ namespace CoffeeMachine.Internal
                 TokenIndex = 0
             };
 
+            // If we inferred the code kind, update it based on the tree we've parsed, so that CSharpFormatter
+            // will know how to parse the corresponding C#.
             if (options.ParseAs == CodeKind.Infer)
             {
+                // CodeKind.Infer means we called codeSnippet() on the parser.
                 options.ParseAs = GetCodeKind((CodeSnippetContext)tree);
             }
         }
