@@ -53,6 +53,14 @@ Total lexer+parser time 30844ms.
  */
 grammar Java8;
 
+// https://stackoverflow.com/q/47987888/4077294
+codeSnippet
+	:	compilationUnit
+	|	classBodyDeclarations
+	|	blockStatements
+	|	expression
+	;
+
 /*
  * Productions from §3 (Lexical Structure)
  */

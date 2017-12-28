@@ -4,9 +4,9 @@
     {
         Infer,
 
-        Expression,
-        MethodBody,
+        CompilationUnit,
         ClassBody,
-        CompilationUnit
+        MethodBody,
+        Expression
     }
 }
