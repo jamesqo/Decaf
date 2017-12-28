@@ -24,6 +24,7 @@ namespace CoffeeMachine.Internal
                 cuRoot = AddClasses(cuRoot, state.Classes, parseOptions);
                 cuRoot = AddNamespace(cuRoot, state.Namespace);
                 cuRoot = AddUsings(cuRoot, state.Usings, state.UsingStatics);
+                root = cuRoot;
             }
 
             root = root.WithAdditionalAnnotations(Formatter.Annotation, Simplifier.Annotation).NormalizeWhitespace();
