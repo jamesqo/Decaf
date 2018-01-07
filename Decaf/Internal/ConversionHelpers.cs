@@ -176,9 +176,15 @@ namespace CoffeeMachine.Internal
                 case "Long":
                     csharpTypeName = "long";
                     break;
+                case "Object":
+                    csharpTypeName = "object";
+                    break;
                 case "short":
                 case "Short":
                     csharpTypeName = "short";
+                    break;
+                case "String":
+                    csharpTypeName = "string";
                     break;
                 default:
                     csharpTypeName = default;
