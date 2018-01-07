@@ -88,7 +88,7 @@ namespace CoffeeMachine.Internal
             D.AssertTrue(!string.IsNullOrEmpty(javaMethodName));
             D.AssertTrue(!javaMethodName.Contains("."));
 
-            return ToPascalCase(javaMethodName);
+            return CamelCaseToPascalCase(javaMethodName);
         }
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace CoffeeMachine.Internal
         public static string ConvertPackageName(string packageName)
         {
             string[] parts = packageName.Split('.', StringSplitOptions.RemoveEmptyEntries);
-            return string.Join('.', parts.Select(ToPascalCase));
+            return string.Join('.', parts.Select(CamelCaseToPascalCase));
         }
 
         /// <summary>
@@ -112,7 +112,12 @@ namespace CoffeeMachine.Internal
 
             string packageName = GetPackageName(javaTypeName);
             string namespaceName = ConvertPackageName(packageName);
-            string csharpUnqualifiedTypeName = ToPascalCase(GetUnqualifiedTypeName(javaTypeName));
+            string csharpUnqualifiedTypeName = YellCaseToPascalCase(GetUnqualifiedTypeName(javaTypeName));
+
+            if (string.IsNullOrEmpty(namespaceName))
+            {
+                return csharpUnqualifiedTypeName;
+            }
             return namespaceName + '.' + csharpUnqualifiedTypeName;
         }
 
@@ -221,11 +226,6 @@ namespace CoffeeMachine.Internal
                 }
                 return new string(buffer);
             }
-        }
-
-        private static string ToPascalCase(string text)
-        {
-            return YellCaseToPascalCase(CamelCaseToPascalCase(text));
         }
 
         /// <summary>

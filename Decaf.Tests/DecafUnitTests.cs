@@ -2,7 +2,7 @@
 
 namespace CoffeeMachine.Tests
 {
-    public class DecafUnitTests
+    public class DecafUnitTests : DecafTestsBase
     {
         public static TheoryData<string, string> Brew_Data()
         {
@@ -48,8 +48,7 @@ namespace CoffeeMachine.Tests
         [MemberData(nameof(Brew_Data))]
         public void Brew(string javaCode, string expectedCSharpCode)
         {
-            var actualCSharpCode = Decaf.Brew(javaCode);
-            Assert.Equal(expectedCSharpCode, actualCSharpCode);
+            CommonBrew(javaCode, expectedCSharpCode);
         }
     }
 }
