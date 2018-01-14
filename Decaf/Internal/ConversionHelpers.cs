@@ -97,7 +97,7 @@ namespace CoffeeMachine.Internal
         public static string ConvertPackageName(string packageName)
         {
             string[] parts = packageName.Split('.', StringSplitOptions.RemoveEmptyEntries);
-            return string.Join('.', parts.Select(CamelCaseToPascalCase));
+            return string.Join(".", parts.Select(CamelCaseToPascalCase));
         }
 
         /// <summary>
@@ -131,7 +131,7 @@ namespace CoffeeMachine.Internal
             string[] parts = javaTypeName.Split('.', StringSplitOptions.RemoveEmptyEntries);
             D.AssertTrue(parts.Length > 0);
             Array.Resize(ref parts, parts.Length - 1);
-            return string.Join('.', parts);
+            return string.Join(".", parts);
         }
 
         /// <summary>
