@@ -881,11 +881,15 @@ switchStatement
 	;
 
 switchBlock
-	:	'{' switchBlockStatementGroup* switchLabel* '}'
+	:	'{' switchBlockStatementGroup* switchBlockEmptyGroup? '}'
 	;
 
 switchBlockStatementGroup
 	:	switchLabels blockStatements
+	;
+
+switchBlockEmptyGroup
+	:	switchLabels
 	;
 
 switchLabels

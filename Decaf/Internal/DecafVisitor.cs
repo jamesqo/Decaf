@@ -646,6 +646,27 @@ namespace CoffeeMachine.Internal
 
         #endregion
 
+        #region Switch statements
+
+        public override Unit VisitSwitchBlockEmptyGroup([NotNull] SwitchBlockEmptyGroupContext context)
+        {
+            base.VisitSwitchBlockEmptyGroup(context);
+
+            Write(" break; ");
+            return default;
+        }
+
+        public override Unit VisitSwitchBlockStatementGroup([NotNull] SwitchBlockStatementGroupContext context)
+        {
+            // TODO(NYI):
+            // - If the last statement is a return, don't insert anything
+            // - If the last statement is a break, don't insert anything
+            // - Otherwise, it falls through. Insert 'goto case [next label];', or 'break;' if this is the last statement group.
+            return base.VisitSwitchBlockStatementGroup(context);
+        }
+
+        #endregion
+
         #region Type references
 
         public override Unit VisitExpressionName([NotNull] ExpressionNameContext context)
