@@ -1,0 +1,21 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div>
+    <h4>Java code</h4>
+    <div id="inputDiv">
+        <textarea id="inputBox" rows="20" cols="50">public class Program {
+    public static void main(String[] args) {
+        System.out.println("Hello, world!");
+    }
+}</textarea>
+    </div>
+    <input value="Submit" type="submit" onclick="onSubmitClick();" />
+
+    <h4>C# code</h4>
+    <div id="outputDiv">
+    </div>
+</div>

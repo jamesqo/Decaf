@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2003
+VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Decaf", "Decaf\Decaf.csproj", "{F7149EF3-B3BF-492C-BCB2-375737BDDB05}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Decaf", "Decaf\Decaf.csproj", "{F7149EF3-B3BF-492C-BCB2-375737BDDB05}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Decaf.Tests", "Decaf.Tests\Decaf.Tests.csproj", "{675B65F1-9F2E-4924-99DC-0B8A5F19E51F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Decaf.Tests", "Decaf.Tests\Decaf.Tests.csproj", "{675B65F1-9F2E-4924-99DC-0B8A5F19E51F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Decaf.WebApp", "Decaf.WebApp\Decaf.WebApp.csproj", "{20AF5ADC-DE4D-4B89-BA68-064F514E895A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{675B65F1-9F2E-4924-99DC-0B8A5F19E51F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{675B65F1-9F2E-4924-99DC-0B8A5F19E51F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{675B65F1-9F2E-4924-99DC-0B8A5F19E51F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20AF5ADC-DE4D-4B89-BA68-064F514E895A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20AF5ADC-DE4D-4B89-BA68-064F514E895A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20AF5ADC-DE4D-4B89-BA68-064F514E895A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20AF5ADC-DE4D-4B89-BA68-064F514E895A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
