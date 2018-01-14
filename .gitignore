@@ -289,3 +289,5 @@ __pycache__/
 
 # ANTLR code generator output
 .antlr/
+
+/private/

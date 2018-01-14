@@ -4,6 +4,7 @@
     <TargetFramework>netstandard1.3</TargetFramework>
     <RootNamespace>CoffeeMachine</RootNamespace>
     <LangVersion>latest</LangVersion>
+    <Version>0.0.1-alpha</Version>
   </PropertyGroup>
 
   <ItemGroup>
