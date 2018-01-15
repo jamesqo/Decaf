@@ -21,6 +21,11 @@ namespace CoffeeMachine
 
         public static string Brew(string javaCode, BrewOptions options = null)
         {
+            if (javaCode == null)
+            {
+                throw new ArgumentNullException(nameof(javaCode));
+            }
+
             options = options ?? BrewOptions.Default;
 
             var pipeline = BuildPipeline(javaCode);

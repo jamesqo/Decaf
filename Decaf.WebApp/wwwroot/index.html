@@ -1,0 +1,32 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Decaffeinator</title>
+
+    <link rel="stylesheet" type="text/css" href="css/site.css" />
+    <script src="js/site.js"></script>
+</head>
+<body>
+    <div id="inputDiv">
+        <div>
+            <textarea id="inputBox" spellcheck="false">public class Program {
+    public static void main(String[] args) {
+        System.out.println("Hello, world!");
+    }
+}</textarea>
+        </div>
+        <div>
+            <input id="submitButton" type="submit" value="Submit" onclick="onSubmitClick();" />
+        </div>
+    </div>
+
+    <div id="outputDiv">public class Program
+{
+    public static void Main(string[] args)
+    {
+        System.Out.Println("Hello, world!");
+    }
+}</div>
+</body>
+</html>
