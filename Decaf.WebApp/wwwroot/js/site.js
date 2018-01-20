@@ -1,6 +1,7 @@
-﻿function onSubmitClick() {
-    var inputBox = document.getElementById("inputBox");
-    var query = "api/convert/?javaCode=" + encodeURIComponent(inputBox.value);
+﻿var editor;
+
+function onSubmitClick() {
+    var query = "api/convert/?javaCode=" + encodeURIComponent(editor.getValue());
     getUrl(query, loadResults);
 }
 
@@ -63,6 +64,6 @@ function loadResults(data) {
     changeSubmitMessage();
 }
 
-var editor = ace.edit("editor");
+editor = ace.edit("editor");
 editor.setTheme("ace/theme/visualstudio");
-editor.session.setMode("ace/mode/csharp");
+editor.session.setMode("ace/mode/java");

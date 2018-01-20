@@ -1,12 +1,14 @@
 ﻿.codeElement {
 	font-family: Inconsolata, Consolas, 'Lucida Console', monospace;
 	font-size: 12pt;
+	white-space: pre;
 }
 
 #editor {
-	/* TODO: Work out how to apply the codeElement class */
+	/* TODO: Find out how to apply .codeElement to the editor */
 	font-family: Inconsolata, Consolas, 'Lucida Console', monospace;
 	font-size: 12pt;
+	white-space: pre;
 
 	width: 100%;
 	height: 10em;
