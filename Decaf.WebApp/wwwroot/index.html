@@ -9,13 +9,11 @@
 <body>
     <div id="leftSide">
         <div id="inputDiv">
-            <div>
-                <div id="input" class="codeElement">public class Program {
+            <div id="input" class="codeElement">public class Program {
     public static void main(String[] args) {
         System.out.println("Hello, world!");
     }
 }</div>
-            </div>
             <div>
                 <input id="submitButton" type="submit" value="Extract Cocoa Beans" onclick="onSubmitClick();" />
             </div>
@@ -23,13 +21,15 @@
     </div>
 
     <div id="rightSide">
-        <div id="outputDiv" class="codeElement">public class Program
+        <div id="outputDiv">
+            <div id="output">public class Program
 {
     public static void Main(string[] args)
     {
         System.Out.Println("Hello, world!");
     }
 }</div>
+        </div>
     </div>
 
     <script src="lib/ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>

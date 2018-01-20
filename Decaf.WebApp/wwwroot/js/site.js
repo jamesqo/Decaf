@@ -53,10 +53,7 @@ function enableSubmit(enabled) {
 }
 
 function setResult(data) {
-    var container = document.getElementById("outputDiv");
-    if (container) {
-        container.innerHTML = data;
-    }
+    output.setValue(data);
 }
 
 function loadResults(data) {
@@ -65,5 +62,23 @@ function loadResults(data) {
 }
 
 input = ace.edit("input");
-input.setTheme("ace/theme/visualstudio");
-input.session.setMode("ace/mode/java");
+input.setOptions({
+    highlightActiveLine: false,
+    highlightGutterLine: false,
+    maxLines: Infinity,
+    mode: "ace/mode/java",
+    showGutter: false,
+    theme: "ace/theme/visualstudio"
+});
+
+output = ace.edit("output");
+output.setOptions({
+    highlightActiveLine: false,
+    highlightGutterLine: false,
+    maxLines: Infinity,
+    mode: "ace/mode/csharp",
+    readOnly: true,
+    showGutter: false,
+    theme: "ace/theme/visualstudio"
+});
+output.renderer.$cursorLayer.element.style.display = "none"; // Disables the cursor
