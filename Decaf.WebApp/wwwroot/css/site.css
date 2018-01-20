@@ -1,15 +1,13 @@
-﻿body {
-}
-
-textarea {
-}
-
-.codeElement {
+﻿.codeElement {
 	font-family: Inconsolata, Consolas, 'Lucida Console', monospace;
 	font-size: 12pt;
 }
 
-#inputBox {
+#editor {
+	/* TODO: Work out how to apply the codeElement class */
+	font-family: Inconsolata, Consolas, 'Lucida Console', monospace;
+	font-size: 12pt;
+
 	width: 100%;
 	height: 10em;
 }
@@ -25,7 +23,8 @@ textarea {
 }
 
 #outputDiv {
-	white-space: pre;
+	margin: 0 auto;
+	width: 90%;
 }
 
 #rightSide {

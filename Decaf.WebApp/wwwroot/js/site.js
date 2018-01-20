@@ -1,6 +1,4 @@
 ﻿function onSubmitClick() {
-    changeSubmitMessage();
-
     var inputBox = document.getElementById("inputBox");
     var query = "api/convert/?javaCode=" + encodeURIComponent(inputBox.value);
     getUrl(query, loadResults);
@@ -15,6 +13,7 @@ function changeSubmitMessage() {
         "Reduce Energy Levels",
         "Prevent Afternoon Sleepiness",
         "Brew Your Soul",
+        "Increase Longevity"
     ];
 
     var currentMessage = submitButton.value;
@@ -34,7 +33,7 @@ function getUrl(url, callback) {
     xhr.open("GET", url, true);
     xhr.setRequestHeader("Accept", "text/html");
     xhr.onreadystatechange = function() {
-        if (xhr.readyState == 4) {
+        if (xhr.readyState === 4) {
             var data = xhr.responseText;
             if (typeof data === "string" && data.length > 0) {
                 callback(data);
@@ -61,4 +60,9 @@ function setResult(data) {
 
 function loadResults(data) {
     setResult(data);
+    changeSubmitMessage();
 }
+
+var editor = ace.edit("editor");
+editor.setTheme("ace/theme/visualstudio");
+editor.session.setMode("ace/mode/csharp");

@@ -5,17 +5,16 @@
     <title>Decaffeinator</title>
 
     <link rel="stylesheet" type="text/css" href="css/site.css" />
-    <script src="js/site.js"></script>
 </head>
 <body>
     <div id="leftSide">
         <div id="inputDiv">
             <div>
-                <textarea id="inputBox" class="codeElement" spellcheck="false">public class Program {
+                <div id="editor" class="codeElement">public class Program {
     public static void main(String[] args) {
         System.out.println("Hello, world!");
     }
-}</textarea>
+}</div>
             </div>
             <div>
                 <input id="submitButton" type="submit" value="Extract Cocoa Beans" onclick="onSubmitClick();" />
@@ -24,13 +23,18 @@
     </div>
 
     <div id="rightSide">
-        <div id="outputDiv" class="codeElement">public class Program
+        <div id="outputDiv">
+            <pre><code class="codeElement">public class Program
 {
     public static void Main(string[] args)
     {
         System.Out.Println("Hello, world!");
     }
-}</div>
+}</code></pre>
+        </div>
     </div>
+
+    <script src="lib/ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/site.js"></script>
 </body>
 </html>
