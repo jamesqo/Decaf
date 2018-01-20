@@ -1,7 +1,31 @@
 ﻿function onSubmitClick() {
+    changeSubmitMessage();
+
     var inputBox = document.getElementById("inputBox");
     var query = "api/convert/?javaCode=" + encodeURIComponent(inputBox.value);
     getUrl(query, loadResults);
+}
+
+function changeSubmitMessage() {
+    var submitButton = document.getElementById("submitButton");
+    var messages = [
+        "Extract Cocoa Beans",
+        "Decrease Work Productivity",
+        "Sharpen The Mind",
+        "Reduce Energy Levels",
+        "Prevent Afternoon Sleepiness",
+        "Brew Your Soul",
+    ];
+
+    var currentMessage = submitButton.value;
+    var newMessage;
+
+    do {
+        var randIndex = Math.floor(Math.random() * messages.length);
+        newMessage = messages[randIndex];
+    } while (newMessage === currentMessage);
+
+    submitButton.value = newMessage;
 }
 
 function getUrl(url, callback) {

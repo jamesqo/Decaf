@@ -8,25 +8,29 @@
     <script src="js/site.js"></script>
 </head>
 <body>
-    <div id="inputDiv">
-        <div>
-            <textarea id="inputBox" spellcheck="false">public class Program {
+    <div id="leftSide">
+        <div id="inputDiv">
+            <div>
+                <textarea id="inputBox" class="codeElement" spellcheck="false">public class Program {
     public static void main(String[] args) {
         System.out.println("Hello, world!");
     }
 }</textarea>
-        </div>
-        <div>
-            <input id="submitButton" type="submit" value="Submit" onclick="onSubmitClick();" />
+            </div>
+            <div>
+                <input id="submitButton" type="submit" value="Extract Cocoa Beans" onclick="onSubmitClick();" />
+            </div>
         </div>
     </div>
 
-    <div id="outputDiv">public class Program
+    <div id="rightSide">
+        <div id="outputDiv" class="codeElement">public class Program
 {
     public static void Main(string[] args)
     {
         System.Out.Println("Hello, world!");
     }
 }</div>
+    </div>
 </body>
 </html>
