@@ -34,7 +34,16 @@ namespace CoffeeMachine.WebApp
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseFileServer();
+            var fileServerOptions = new FileServerOptions();
+            fileServerOptions.StaticFileOptions.OnPrepareResponse = context =>
+            {
+                var headers = context.Context.Response.Headers;
+                headers.Add("Cache-Control", "no-cache, no-store");
+                headers.Add("Pragma", "no-cache");
+                headers.Add("Expires", "-1");
+            };
+
+            app.UseFileServer(fileServerOptions);
 
             app.UseMvc();
         }
