@@ -1,7 +1,7 @@
-﻿var editor;
+﻿var input, output;
 
 function onSubmitClick() {
-    var query = "api/convert/?javaCode=" + encodeURIComponent(editor.getValue());
+    var query = "api/convert/?javaCode=" + encodeURIComponent(input.getValue());
     getUrl(query, loadResults);
 }
 
@@ -64,6 +64,6 @@ function loadResults(data) {
     changeSubmitMessage();
 }
 
-editor = ace.edit("editor");
-editor.setTheme("ace/theme/visualstudio");
-editor.session.setMode("ace/mode/java");
+input = ace.edit("input");
+input.setTheme("ace/theme/visualstudio");
+input.session.setMode("ace/mode/java");

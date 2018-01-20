@@ -4,8 +4,8 @@
 	white-space: pre;
 }
 
-#editor {
-	/* TODO: Find out how to apply .codeElement to the editor */
+#input {
+	/* TODO: Find out how to apply .codeElement to the input */
 	font-family: Inconsolata, Consolas, 'Lucida Console', monospace;
 	font-size: 12pt;
 	white-space: pre;
