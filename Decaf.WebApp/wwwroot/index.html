@@ -6,6 +6,7 @@
 
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
         <link rel="stylesheet" type="text/css" href="lib/awesome-bootstrap-checkbox.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/10.0.0/css/bootstrap-slider.min.css" />
 
         <link rel="stylesheet" type="text/css" href="css/site.css" />
     </head>
@@ -37,6 +38,19 @@
         </div>
 
         <div id="optionsContainer">
+            <div>
+                <label id="csharpLangVersionLabel" for="csharpLangVersion">C# language version: 6</label>
+                <br />
+                <!-- data-slider-value="5" corresponds to C# 6 -->
+                <input id="csharpLangVersion"
+                       type="text"
+                       data-provide="slider"
+                       data-slider-id="csharpLangVersionSlider"
+                       data-slider-min="0"
+                       data-slider-max="9"
+                       data-slider-value="5"
+                       data-slider-tooltip="hide" />
+            </div>
             <div class="checkbox checkbox-success">
                 <input id="translateCollectionTypes" class="form-check-input" type="checkbox" checked onclick="onOptionChanged();" />
                 <label for="translateCollectionTypes">Translate collection types</label>
@@ -55,6 +69,7 @@
         <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
         <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
         <script src="https://use.fontawesome.com/abb6d18225.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/10.0.0/bootstrap-slider.min.js"></script>
         
         <script src="js/site.js"></script>
     </body>

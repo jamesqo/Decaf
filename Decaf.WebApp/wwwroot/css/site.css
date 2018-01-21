@@ -7,8 +7,20 @@ body {
 	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+label {
+	font-weight: normal;
+}
+
 .clear {
 	clear: both;
+}
+
+#csharpLangVersionSlider .slider-handle {
+	background: #0000f0;
+}
+
+#csharpLangVersionSlider .slider-selection {
+	background: #8080ff;
 }
 
 #input,

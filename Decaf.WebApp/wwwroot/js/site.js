@@ -32,6 +32,22 @@ function getCheckboxValue(id) {
     return document.getElementById(id).checked;
 }
 
+function getCsharpLangVersion(sliderValue) {
+    var langVersions = [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "7.1",
+        "7.2",
+        "latest"
+    ];
+    return langVersions[sliderValue];
+}
+
 function getUrl(url, callback) {
     // TODO: Indicate you are busy.
 
@@ -54,6 +70,11 @@ function getUrl(url, callback) {
 
 function loadResults(data) {
     setResult(data);
+}
+
+function onCsharpLangVersionChanged(slideEvent) {
+    var label = document.getElementById("csharpLangVersionLabel");
+    label.textContent = "C# language version: " + getCsharpLangVersion(slideEvent.value);
 }
 
 function onInputKeydown(e) {
@@ -96,3 +117,8 @@ output.setOptions({
     theme: "ace/theme/visualstudio"
 });
 output.renderer.$cursorLayer.element.style.display = "none"; // Disables the cursor
+
+// TODO: Don't use jQuery here.
+$("#csharpLangVersion").slider()
+    .on("slide", onCsharpLangVersionChanged)
+    .data("slider");
