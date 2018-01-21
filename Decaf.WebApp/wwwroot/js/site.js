@@ -1,31 +1,15 @@
-﻿var input, output;
+﻿var HashHandler = ace.require("ace/keyboard/hash_handler").HashHandler;
 
-function onSubmitClick() {
+const KEYDOWN_FLUSH_THRESHOLD = 5;
+
+var input, output;
+var keydownsToFlush = 0;
+
+function convertCode() {
+    keydownsToFlush = 0;
+
     var query = "api/convert/?javaCode=" + encodeURIComponent(input.getValue());
     getUrl(query, loadResults);
-}
-
-function changeSubmitMessage() {
-    var submitButton = document.getElementById("submitButton");
-    var messages = [
-        "Extract Cocoa Beans",
-        "Decrease Work Productivity",
-        "Sharpen The Mind",
-        "Reduce Energy Levels",
-        "Prevent Afternoon Sleepiness",
-        "Brew Your Soul",
-        "Increase Longevity"
-    ];
-
-    var currentMessage = submitButton.value;
-    var newMessage;
-
-    do {
-        var randIndex = Math.floor(Math.random() * messages.length);
-        newMessage = messages[randIndex];
-    } while (newMessage === currentMessage);
-
-    submitButton.value = newMessage;
 }
 
 function getUrl(url, callback) {
@@ -33,7 +17,7 @@ function getUrl(url, callback) {
     var xhr = new XMLHttpRequest();
     xhr.open("GET", url, true);
     xhr.setRequestHeader("Accept", "text/html");
-    xhr.onreadystatechange = function() {
+    xhr.onreadystatechange = function () {
         if (xhr.readyState === 4) {
             var data = xhr.responseText;
             if (typeof data === "string" && data.length > 0) {
@@ -58,7 +42,13 @@ function setResult(data) {
 
 function loadResults(data) {
     setResult(data);
-    changeSubmitMessage();
+}
+
+function recordKeydown(editor) {
+    keydownsToFlush++;
+    if (keydownsToFlush === KEYDOWN_FLUSH_THRESHOLD) {
+        convertCode();
+    }
 }
 
 input = ace.edit("input");
@@ -70,6 +60,9 @@ input.setOptions({
     showGutter: false,
     theme: "ace/theme/visualstudio"
 });
+input.keyBinding.addKeyboardHandler(new HashHandler({
+    exec: recordKeydown
+}));
 
 output = ace.edit("output");
 output.setOptions({
