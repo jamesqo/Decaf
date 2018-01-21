@@ -16,8 +16,8 @@ function convertCode() {
     keydownsToFlush = 0;
 
     var params = {
-        csharpLanguageVersion: getCsharpLangVersion(getValue("csharpLangVersion")),
         javaCode: input.getValue(),
+        csharpLanguageVersion: getCsharpLangVersion(getValue("csharpLangVersion")),
         translateCollectionTypes: getCheckboxValue("translateCollectionTypes"),
         unqualifyTypeNames: getCheckboxValue("unqualifyTypeNames"),
         useVarInDeclarations: getCheckboxValue("useVarInDeclarations"),
