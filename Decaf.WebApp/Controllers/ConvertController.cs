@@ -11,6 +11,7 @@ namespace CoffeeMachine.WebApp.Controllers
         public string Get(
             string javaCode,
             LanguageVersion csharpLanguageVersion,
+            IndentationStyle indentationStyle,
             bool translateCollectionTypes,
             bool unqualifyTypeNames,
             bool useVarInDeclarations)
@@ -20,6 +21,7 @@ namespace CoffeeMachine.WebApp.Controllers
                 var options = new BrewOptions
                 {
                     CSharpLanguageVersion = csharpLanguageVersion,
+                    IndentationStyle = indentationStyle,
                     TranslateCollectionTypes = translateCollectionTypes,
                     UnqualifyTypeNames = unqualifyTypeNames,
                     UseVarInDeclarations = useVarInDeclarations

@@ -17,7 +17,8 @@ function convertCode() {
 
     var params = {
         javaCode: input.getValue(),
-        csharpLanguageVersion: getCsharpLangVersion(getValue("csharpLangVersion")),
+        csharpLanguageVersion: getCsharpLangVersion(getSliderValue("csharpLangVersion")),
+        indentationStyle: getRadioValue("indentationStyle"),
         translateCollectionTypes: getCheckboxValue("translateCollectionTypes"),
         unqualifyTypeNames: getCheckboxValue("unqualifyTypeNames"),
         useVarInDeclarations: getCheckboxValue("useVarInDeclarations"),
@@ -49,6 +50,22 @@ function getCsharpLangVersion(sliderValue) {
     return langVersions[sliderValue];
 }
 
+function getRadioValue(name) {
+    var radios = document.getElementsByName(name);
+
+    for (var i = 0; i < radios.length; i++) {
+        if (radios[i].checked) {
+            return radios[i].value;
+        }
+    }
+
+    throw new Error("Could not find checked radio button with name: " + name);
+}
+
+function getSliderValue(id) {
+    return document.getElementById(id).value;
+}
+
 function getUrl(url, callback) {
     // TODO: Indicate you are busy.
 
@@ -67,10 +84,6 @@ function getUrl(url, callback) {
     };
     xhr.send();
     return xhr;
-}
-
-function getValue(id) {
-    return document.getElementById(id).value;
 }
 
 function loadResults(data) {
