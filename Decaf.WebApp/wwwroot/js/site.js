@@ -37,7 +37,9 @@ function enableSubmit(enabled) {
 }
 
 function setResult(data) {
-    output.setValue(data);
+    // Passing -1 positions the (invisible) cursor for 'output' at the start.
+    // It ensures that the div is always scrolled to the left as much as possible, and prevents the text of the div from being highlighted.
+    output.setValue(data, -1);
 }
 
 function loadResults(data) {

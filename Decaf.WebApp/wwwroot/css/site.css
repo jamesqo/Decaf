@@ -32,6 +32,11 @@
 	width: 100%;
 }
 
+/* Disables brace matching for #output */
+#output .ace_marker-layer .ace_bracket {
+	display: none;
+}
+
 #outputContainer {
 	margin: 0 auto;
 	width: 90%;

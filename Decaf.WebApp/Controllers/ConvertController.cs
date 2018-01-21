@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CoffeeMachine.WebApp.Controllers
@@ -12,7 +9,21 @@ namespace CoffeeMachine.WebApp.Controllers
         [HttpGet]
         public string Get(string javaCode)
         {
-            return Decaf.Brew(javaCode);
+            try
+            {
+                return Decaf.Brew(javaCode);
+            }
+            catch (Exception e)
+            {
+                return string.Join(Environment.NewLine, new[]
+                {
+                    "Unable to convert code because an exception occurred.",
+                    $"Exception type: {e.GetType()}",
+                    $"Exception message: {e.Message}",
+                    "Stack trace:",
+                    e.StackTrace
+                });
+            }
         }
     }
 }
