@@ -11,123 +11,125 @@
         <link rel="stylesheet" type="text/css" href="css/site.css" />
     </head>
     <body>
-        <div id="inputOutputContainer">
-            <div id="leftSide">
-                <div id="inputContainer">
-                    <div id="input">public class Program {
+        <div id="container">
+            <div id="inputOutputContainer">
+                <div id="leftSide">
+                    <div id="inputContainer">
+                        <div id="input">public class Program {
     public static void main(String[] args) {
         System.out.println("Hello, world!");
     }
 }</div>
+                    </div>
                 </div>
-            </div>
 
-            <div id="rightSide">
-                <div id="outputContainer">
-                    <div id="output">public class Program
+                <div id="rightSide">
+                    <div id="outputContainer">
+                        <div id="output">public class Program
 {
     public static void Main(string[] args)
     {
         System.Out.Println("Hello, world!");
     }
 }</div>
-                </div>
-            </div>
-
-            <br class="clear" />
-        </div>
-
-        <div id="optionsContainer">
-            <div class="optionGroup">
-                <label id="csharpLangVersionLabel">C# language version: 6</label>
-                <br />
-                <!-- data-slider-value="5" corresponds to C# 6 -->
-                <input id="csharpLangVersion"
-                       type="text"
-                       data-provide="slider"
-                       data-slider-id="csharpLangVersionSlider"
-                       data-slider-min="0"
-                       data-slider-max="9"
-                       data-slider-value="5"
-                       data-slider-tooltip="hide" />
-            </div>
-
-            <div class="optionGroup">
-                <label>Parse as:</label>
-                <div class="radio radio-danger">
-                    <input id="parseAsMethodBody" type="radio" name="parseAs" value="methodBody" onchange="onOptionValueChanged();" />
-                    <label for="parseAsMethodBody">Statement(s)</label>
-                </div>
-                <div class="radio radio-danger">
-                    <input id="parseAsCompilationUnit" type="radio" name="parseAs" value="compilationUnit" onchange="onOptionValueChanged();" />
-                    <label for="parseAsCompilationUnit">Whole Java file</label>
-                </div>
-                <div class="radio radio-danger">
-                    <input id="parseAsClassBody" type="radio" name="parseAs" value="classBody" onchange="onOptionValueChanged();" />
-                    <label for="parseAsClassBody">Member definition(s)</label>
-                </div>
-                <div class="radio radio-danger">
-                    <input id="parseAsExpression" type="radio" name="parseAs" value="expression" onchange="onOptionValueChanged();" />
-                    <label for="parseAsExpression">Expression</label>
-                </div>
-                <div class="radio radio-danger">
-                    <input id="parseAsInfer" type="radio" name="parseAs" value="infer" checked onchange="onOptionValueChanged();" />
-                    <label for="parseAsInfer">Infer code kind (beta)</label>
-                </div>
-            </div>
-
-            <div class="optionGroup">
-                <div class="optionComponent">
-                    <label>Output indentation style:</label>
-                    <div class="radio radio-danger">
-                        <input id="indentationStylePreserve" type="radio" name="indentationStyle" value="preserve" checked onchange="onIndentationStyleChanged();" />
-                        <label for="indentationStylePreserve">Preserve</label>
                     </div>
-                    <div class="radio radio-danger">
-                        <input id="indentationStyleTabs" type="radio" name="indentationStyle" value="tabs" onchange="onIndentationStyleChanged();" />
-                        <label for="indentationStyleTabs">Tabs</label>
-                    </div>
-                    <div class="radio radio-danger">
-                        <input id="indentationStyleSpaces" type="radio" name="indentationStyle" value="spaces" onchange="onIndentationStyleChanged();" />
-                        <label for="indentationStyleSpaces">Spaces</label>
-                    </div>
-                </div>
-
-                <div class="optionComponent">
-                    <!-- TODO: Gray this label out initially. -->
-                    <label id="spacesPerIndentLabel">Spaces per indent: 4</label>
-                    <br />
-                    <!-- data-slider-value="2" corresponds to 4 spaces per indent -->
-                    <input id="spacesPerIndent"
-                           type="text"
-                           data-provide="slider"
-                           data-slider-id="spacesPerIndentSlider"
-                           data-slider-min="0"
-                           data-slider-max="3"
-                           data-slider-value="2"
-                           data-slider-tooltip="hide"
-                           data-slider-enabled="false" />
                 </div>
 
                 <br class="clear" />
             </div>
 
-            <div class="optionGroup">
-                <div class="checkbox checkbox-success">
-                    <input id="useVarInDeclarations" class="form-check-input" type="checkbox" checked onclick="onOptionValueChanged();" />
-                    <label for="useVarInDeclarations">Use 'var' in declarations</label>
+            <div id="optionContainer">
+                <div class="optionGroup">
+                    <label id="csharpLangVersionLabel">C# language version: 6</label>
+                    <br />
+                    <!-- data-slider-value="5" corresponds to C# 6 -->
+                    <input id="csharpLangVersion"
+                           type="text"
+                           data-provide="slider"
+                           data-slider-id="csharpLangVersionSlider"
+                           data-slider-min="0"
+                           data-slider-max="9"
+                           data-slider-value="5"
+                           data-slider-tooltip="hide" />
                 </div>
-                <div class="checkbox checkbox-success">
-                    <input id="unqualifyTypeNames" class="form-check-input" type="checkbox" onclick="onOptionValueChanged();" />
-                    <label for="unqualifyTypeNames">Unqualify type names</label>
-                </div>
-                <div class="checkbox checkbox-success">
-                    <input id="translateCollectionTypes" class="form-check-input" type="checkbox" checked onclick="onOptionValueChanged();" />
-                    <label for="translateCollectionTypes">Translate collection types</label>
-                </div>
-            </div>
 
-            <br class="clear" />
+                <div class="optionGroup">
+                    <label>Parse as:</label>
+                    <div class="radio radio-danger">
+                        <input id="parseAsMethodBody" type="radio" name="parseAs" value="methodBody" onchange="onOptionValueChanged();" />
+                        <label for="parseAsMethodBody">Statement(s)</label>
+                    </div>
+                    <div class="radio radio-danger">
+                        <input id="parseAsCompilationUnit" type="radio" name="parseAs" value="compilationUnit" onchange="onOptionValueChanged();" />
+                        <label for="parseAsCompilationUnit">Whole Java file</label>
+                    </div>
+                    <div class="radio radio-danger">
+                        <input id="parseAsClassBody" type="radio" name="parseAs" value="classBody" onchange="onOptionValueChanged();" />
+                        <label for="parseAsClassBody">Member definition(s)</label>
+                    </div>
+                    <div class="radio radio-danger">
+                        <input id="parseAsExpression" type="radio" name="parseAs" value="expression" onchange="onOptionValueChanged();" />
+                        <label for="parseAsExpression">Expression</label>
+                    </div>
+                    <div class="radio radio-danger">
+                        <input id="parseAsInfer" type="radio" name="parseAs" value="infer" checked onchange="onOptionValueChanged();" />
+                        <label for="parseAsInfer">Infer code kind (beta)</label>
+                    </div>
+                </div>
+
+                <div class="optionGroup">
+                    <div class="optionComponent">
+                        <label>Output indentation style:</label>
+                        <div class="radio radio-danger">
+                            <input id="indentationStylePreserve" type="radio" name="indentationStyle" value="preserve" checked onchange="onIndentationStyleChanged();" />
+                            <label for="indentationStylePreserve">Preserve</label>
+                        </div>
+                        <div class="radio radio-danger">
+                            <input id="indentationStyleTabs" type="radio" name="indentationStyle" value="tabs" onchange="onIndentationStyleChanged();" />
+                            <label for="indentationStyleTabs">Tabs</label>
+                        </div>
+                        <div class="radio radio-danger">
+                            <input id="indentationStyleSpaces" type="radio" name="indentationStyle" value="spaces" onchange="onIndentationStyleChanged();" />
+                            <label for="indentationStyleSpaces">Spaces</label>
+                        </div>
+                    </div>
+
+                    <div class="optionComponent">
+                        <!-- TODO: Gray this label out initially. -->
+                        <label id="spacesPerIndentLabel">Spaces per indent: 4</label>
+                        <br />
+                        <!-- data-slider-value="2" corresponds to 4 spaces per indent -->
+                        <input id="spacesPerIndent"
+                               type="text"
+                               data-provide="slider"
+                               data-slider-id="spacesPerIndentSlider"
+                               data-slider-min="0"
+                               data-slider-max="3"
+                               data-slider-value="2"
+                               data-slider-tooltip="hide"
+                               data-slider-enabled="false" />
+                    </div>
+
+                    <br class="clear" />
+                </div>
+
+                <div class="optionGroup">
+                    <div class="checkbox checkbox-success">
+                        <input id="useVarInDeclarations" class="form-check-input" type="checkbox" checked onclick="onOptionValueChanged();" />
+                        <label for="useVarInDeclarations">Use 'var' in declarations</label>
+                    </div>
+                    <div class="checkbox checkbox-success">
+                        <input id="unqualifyTypeNames" class="form-check-input" type="checkbox" onclick="onOptionValueChanged();" />
+                        <label for="unqualifyTypeNames">Unqualify type names</label>
+                    </div>
+                    <div class="checkbox checkbox-success">
+                        <input id="translateCollectionTypes" class="form-check-input" type="checkbox" checked onclick="onOptionValueChanged();" />
+                        <label for="translateCollectionTypes">Translate collection types</label>
+                    </div>
+                </div>
+
+                <br class="clear" />
+            </div>
         </div>
 
         <script src="lib/ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
