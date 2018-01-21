@@ -38,7 +38,7 @@
         </div>
 
         <div id="optionsContainer">
-            <div>
+            <div class="optionGroup">
                 <label id="csharpLangVersionLabel" for="csharpLangVersion">C# language version: 6</label>
                 <br />
                 <!-- data-slider-value="5" corresponds to C# 6 -->
@@ -51,17 +51,34 @@
                        data-slider-value="5"
                        data-slider-tooltip="hide" />
             </div>
-            <div class="checkbox checkbox-success">
-                <input id="translateCollectionTypes" class="form-check-input" type="checkbox" checked onclick="onOptionValueChanged();" />
-                <label for="translateCollectionTypes">Translate collection types</label>
+            <div class="optionGroup">
+                <label>Indentation style:</label>
+                <div class="radio radio-danger">
+                    <input id="indentationStylePreserve" type="radio" name="indentationStyle" value="preserve" checked />
+                    <label for="indentationStylePreserve">Preserve</label>
+                </div>
+                <div class="radio radio-danger">
+                    <input id="indentationStyleTabs" type="radio" name="indentationStyle" value="tabs" />
+                    <label for="indentationStyleTabs">Tabs</label>
+                </div>
+                <div class="radio radio-danger">
+                    <input id="indentationStyleSpaces" type="radio" name="indentationStyle" value="spaces" />
+                    <label for="indentationStyleSpaces">Spaces</label>
+                </div>
             </div>
-            <div class="checkbox checkbox-success">
-                <input id="unqualifyTypeNames" class="form-check-input" type="checkbox" onclick="onOptionValueChanged();" />
-                <label for="unqualifyTypeNames">Unqualify type names</label>
-            </div>
-            <div class="checkbox checkbox-success">
-                <input id="useVarInDeclarations" class="form-check-input" type="checkbox" checked onclick="onOptionValueChanged();" />
-                <label for="useVarInDeclarations">Use 'var' in declarations</label>
+            <div class="optionGroup">
+                <div class="checkbox checkbox-success">
+                    <input id="translateCollectionTypes" class="form-check-input" type="checkbox" checked onclick="onOptionValueChanged();" />
+                    <label for="translateCollectionTypes">Translate collection types</label>
+                </div>
+                <div class="checkbox checkbox-success">
+                    <input id="unqualifyTypeNames" class="form-check-input" type="checkbox" onclick="onOptionValueChanged();" />
+                    <label for="unqualifyTypeNames">Unqualify type names</label>
+                </div>
+                <div class="checkbox checkbox-success">
+                    <input id="useVarInDeclarations" class="form-check-input" type="checkbox" checked onclick="onOptionValueChanged();" />
+                    <label for="useVarInDeclarations">Use 'var' in declarations</label>
+                </div>
             </div>
         </div>
 

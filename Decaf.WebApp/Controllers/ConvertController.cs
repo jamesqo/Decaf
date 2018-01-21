@@ -41,6 +41,7 @@ namespace CoffeeMachine.WebApp.Controllers
 
         private static LanguageVersion ParseLanguageVersion(string versionText)
         {
+            versionText = versionText.ToLowerInvariant();
             switch (versionText)
             {
                 case "1":

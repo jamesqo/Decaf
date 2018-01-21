@@ -15,6 +15,18 @@ label {
 	clear: both;
 }
 
+.optionGroup {
+	margin-top: 1.5em;
+}
+
+.optionGroup:first-child {
+	margin-top: 0;
+}
+
+.radio {
+	margin-top: 0;
+}
+
 #csharpLangVersionSlider .slider-handle {
 	background: #0000f0;
 }
