@@ -19,6 +19,7 @@ function convertCode() {
         javaCode: input.getValue(),
         csharpLanguageVersion: getCsharpLangVersion(getSliderValue("csharpLangVersion")),
         indentationStyle: getRadioValue("indentationStyle"),
+        parseAs: getRadioValue("parseAs"),
         translateCollectionTypes: getCheckboxValue("translateCollectionTypes"),
         unqualifyTypeNames: getCheckboxValue("unqualifyTypeNames"),
         useVarInDeclarations: getCheckboxValue("useVarInDeclarations"),

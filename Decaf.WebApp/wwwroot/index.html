@@ -52,6 +52,29 @@
                        data-slider-tooltip="hide" />
             </div>
             <div class="optionGroup">
+                <label>Parse as:</label>
+                <div class="radio radio-danger">
+                    <input id="parseAsMethodBody" type="radio" name="parseAs" value="methodBody" onchange="onOptionValueChanged();" />
+                    <label for="parseAsMethodBody">Statement(s)</label>
+                </div>
+                <div class="radio radio-danger">
+                    <input id="parseAsCompilationUnit" type="radio" name="parseAs" value="compilationUnit" onchange="onOptionValueChanged();" />
+                    <label for="parseAsCompilationUnit">Whole Java file</label>
+                </div>
+                <div class="radio radio-danger">
+                    <input id="parseAsClassBody" type="radio" name="parseAs" value="classBody" onchange="onOptionValueChanged();" />
+                    <label for="parseAsClassBody">Member definition(s)</label>
+                </div>
+                <div class="radio radio-danger">
+                    <input id="parseAsExpression" type="radio" name="parseAs" value="expression" onchange="onOptionValueChanged();" />
+                    <label for="parseAsExpression">Expression</label>
+                </div>
+                <div class="radio radio-danger">
+                    <input id="parseAsInfer" type="radio" name="parseAs" value="infer" checked onchange="onOptionValueChanged();" />
+                    <label for="parseAsInfer">Infer code kind (beta)</label>
+                </div>
+            </div>
+            <div class="optionGroup">
                 <label>Indentation style:</label>
                 <div class="radio radio-danger">
                     <input id="indentationStylePreserve" type="radio" name="indentationStyle" value="preserve" checked onchange="onOptionValueChanged();" />

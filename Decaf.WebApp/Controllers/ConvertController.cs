@@ -12,6 +12,7 @@ namespace CoffeeMachine.WebApp.Controllers
             string javaCode,
             LanguageVersion csharpLanguageVersion,
             IndentationStyle indentationStyle,
+            CodeKind parseAs,
             bool translateCollectionTypes,
             bool unqualifyTypeNames,
             bool useVarInDeclarations)
@@ -22,6 +23,7 @@ namespace CoffeeMachine.WebApp.Controllers
                 {
                     CSharpLanguageVersion = csharpLanguageVersion,
                     IndentationStyle = indentationStyle,
+                    ParseAs = parseAs,
                     TranslateCollectionTypes = translateCollectionTypes,
                     UnqualifyTypeNames = unqualifyTypeNames,
                     UseVarInDeclarations = useVarInDeclarations
