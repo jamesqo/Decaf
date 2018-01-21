@@ -1,11 +1,9 @@
-﻿.codeElement {
-	font-family: Inconsolata, Consolas, 'Lucida Console', monospace;
-	font-size: 12pt;
-	white-space: pre;
+﻿.clear {
+	clear: both;
 }
 
-#input {
-	/* TODO: Find out how to apply .codeElement here */
+#input,
+#output {
 	font-family: Inconsolata, Consolas, 'Lucida Console', monospace;
 	font-size: 12pt;
 	white-space: pre;
@@ -13,7 +11,8 @@
 	width: 100%;
 }
 
-#inputContainer {
+#inputContainer,
+#outputContainer {
 	margin: 0 auto;
 	width: 90%;
 }
@@ -23,23 +22,15 @@
 	width: 50%;
 }
 
-#output {
-	/* TODO: Find out how to apply .codeElement here */
-	font-family: Inconsolata, Consolas, 'Lucida Console', monospace;
-	font-size: 12pt;
-	white-space: pre;
-
-	width: 100%;
+#optionsContainer {
+	margin: 0 auto;
+	margin-top: 1em;
+	width: 95%;
 }
 
-/* Disables brace matching for #output */
+/* Disables brace-matching for #output */
 #output .ace_marker-layer .ace_bracket {
 	display: none;
-}
-
-#outputContainer {
-	margin: 0 auto;
-	width: 90%;
 }
 
 #rightSide {

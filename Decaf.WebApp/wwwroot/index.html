@@ -9,44 +9,44 @@
     <link rel="stylesheet" type="text/css" href="css/site.css" />
 </head>
 <body>
-    <div id="leftSide">
-        <div id="inputContainer">
-            <div id="input">public class Program {
+    <div id="inputOutputContainer">
+        <div id="leftSide">
+            <div id="inputContainer">
+                <div id="input">public class Program {
     public static void main(String[] args) {
         System.out.println("Hello, world!");
     }
 }</div>
-            <!--
-            <div>
-                <label>
-                    <!-- TODO: Slider control for csharpLanguageVersion -.->
-                </label>
-            </div>
-            -->
-            <div class="abc-checkbox abc-checkbox-success">
-                <input id="translateCollectionTypes" class="form-check-input" type="checkbox" checked="checked" onclick="onOptionChanged();" />
-                <label for="translateCollectionTypes">Translate collection types</label>
-            </div>
-            <div class="abc-checkbox abc-checkbox-success">
-                <input id="unqualifyTypeNames" class="form-check-input" type="checkbox" checked="checked" onclick="onOptionChanged();" />
-                <label for="unqualifyTypeNames">Unqualify type names</label>
-            </div>
-            <div class="abc-checkbox abc-checkbox-success">
-                <input id="useVarInDeclarations" class="form-check-input" type="checkbox" checked="checked" onclick="onOptionChanged();" />
-                <label for="useVarInDeclarations">Use 'var' in declarations</label>
             </div>
         </div>
-    </div>
 
-    <div id="rightSide">
-        <div id="outputContainer">
-            <div id="output">public class Program
+        <div id="rightSide">
+            <div id="outputContainer">
+                <div id="output">public class Program
 {
     public static void Main(string[] args)
     {
         System.Out.Println("Hello, world!");
     }
 }</div>
+            </div>
+        </div>
+
+        <br class="clear" />
+    </div>
+
+    <div id="optionsContainer">
+        <div class="abc-checkbox abc-checkbox-success">
+            <input id="translateCollectionTypes" class="form-check-input" type="checkbox" checked onclick="onOptionChanged();" />
+            <label for="translateCollectionTypes">Translate collection types</label>
+        </div>
+        <div class="abc-checkbox abc-checkbox-success">
+            <input id="unqualifyTypeNames" class="form-check-input" type="checkbox" onclick="onOptionChanged();" />
+            <label for="unqualifyTypeNames">Unqualify type names</label>
+        </div>
+        <div class="abc-checkbox abc-checkbox-success">
+            <input id="useVarInDeclarations" class="form-check-input" type="checkbox" checked onclick="onOptionChanged();" />
+            <label for="useVarInDeclarations">Use 'var' in declarations</label>
         </div>
     </div>
 
