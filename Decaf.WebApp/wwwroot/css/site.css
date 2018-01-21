@@ -16,20 +16,20 @@ label {
 }
 
 .optionComponent {
-	float: left;
-	margin-left: 5em;
-}
-
-.optionComponent:first-child {
-	margin-left: 0;
-}
-
-.optionGroup {
 	margin-top: 1.5em;
 }
 
-.optionGroup:first-child {
+.optionComponent:first-child {
 	margin-top: 0;
+}
+
+.optionGroup {
+	float: left;
+	margin-left: 3em;
+}
+
+.optionGroup:first-child {
+	margin-left: 0;
 }
 
 .radio {
