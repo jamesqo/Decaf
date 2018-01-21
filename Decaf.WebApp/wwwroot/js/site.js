@@ -107,6 +107,21 @@ function onCsharpLangVersionSlide(slideEvent) {
     label.textContent = "C# language version: " + getCsharpLangVersion(slideEvent.value);
 }
 
+function onIndentationStyleChanged() {
+    var newStyle = getRadioValue("indentationStyle");
+    switch (newStyle) {
+        case "preserve":
+        case "tabs":
+            setSpacesPerIndentEnabled(false);
+            break;
+        case "spaces":
+            setSpacesPerIndentEnabled(true);
+            break;
+    }
+
+    onOptionValueChanged();
+}
+
 function onInputKeydown(e) {
     keydownsToFlush++;
     if (keydownsToFlush === KEYDOWN_FLUSH_THRESHOLD) {
@@ -127,6 +142,16 @@ function setResult(data) {
     // Passing -1 positions the (invisible) cursor for 'output' at the start.
     // It ensures that the div is always scrolled to the left as much as possible, and prevents the text of the div from being highlighted.
     output.setValue(data, -1);
+}
+
+function setSpacesPerIndentEnabled(enabled) {
+    if (enabled) {
+        // TODO: Make label text black
+        $("#spacesPerIndent").slider("enable");
+    } else {
+        // TODO: Gray out label text
+        $("#spacesPerIndent").slider("disable");
+    }
 }
 
 input = ace.edit("input");

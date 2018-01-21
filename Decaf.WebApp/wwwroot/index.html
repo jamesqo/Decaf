@@ -78,20 +78,21 @@
                 <div class="optionComponent">
                     <label>Output indentation style:</label>
                     <div class="radio radio-danger">
-                        <input id="indentationStylePreserve" type="radio" name="indentationStyle" value="preserve" checked onchange="onOptionValueChanged();" />
+                        <input id="indentationStylePreserve" type="radio" name="indentationStyle" value="preserve" checked onchange="onIndentationStyleChanged();" />
                         <label for="indentationStylePreserve">Preserve</label>
                     </div>
                     <div class="radio radio-danger">
-                        <input id="indentationStyleTabs" type="radio" name="indentationStyle" value="tabs" onchange="onOptionValueChanged();" />
+                        <input id="indentationStyleTabs" type="radio" name="indentationStyle" value="tabs" onchange="onIndentationStyleChanged();" />
                         <label for="indentationStyleTabs">Tabs</label>
                     </div>
                     <div class="radio radio-danger">
-                        <input id="indentationStyleSpaces" type="radio" name="indentationStyle" value="spaces" onchange="onOptionValueChanged();" />
+                        <input id="indentationStyleSpaces" type="radio" name="indentationStyle" value="spaces" onchange="onIndentationStyleChanged();" />
                         <label for="indentationStyleSpaces">Spaces</label>
                     </div>
                 </div>
 
                 <div class="optionComponent">
+                    <!-- TODO: Gray this label out initially. -->
                     <label id="spacesPerIndentLabel">Spaces per indent: 4</label>
                     <br />
                     <!-- data-slider-value="2" corresponds to 4 spaces per indent -->
@@ -102,7 +103,8 @@
                            data-slider-min="0"
                            data-slider-max="3"
                            data-slider-value="2"
-                           data-slider-tooltip="hide" />
+                           data-slider-tooltip="hide"
+                           data-slider-enabled="false" />
                 </div>
 
                 <br class="clear" />
