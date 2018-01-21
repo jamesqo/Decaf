@@ -75,19 +75,37 @@
                 </div>
             </div>
             <div class="optionGroup">
-                <label>Indentation style:</label>
-                <div class="radio radio-danger">
-                    <input id="indentationStylePreserve" type="radio" name="indentationStyle" value="preserve" checked onchange="onOptionValueChanged();" />
-                    <label for="indentationStylePreserve">Preserve</label>
+                <div class="optionComponent">
+                    <label>Output indentation style:</label>
+                    <div class="radio radio-danger">
+                        <input id="indentationStylePreserve" type="radio" name="indentationStyle" value="preserve" checked onchange="onOptionValueChanged();" />
+                        <label for="indentationStylePreserve">Preserve</label>
+                    </div>
+                    <div class="radio radio-danger">
+                        <input id="indentationStyleTabs" type="radio" name="indentationStyle" value="tabs" onchange="onOptionValueChanged();" />
+                        <label for="indentationStyleTabs">Tabs</label>
+                    </div>
+                    <div class="radio radio-danger">
+                        <input id="indentationStyleSpaces" type="radio" name="indentationStyle" value="spaces" onchange="onOptionValueChanged();" />
+                        <label for="indentationStyleSpaces">Spaces</label>
+                    </div>
                 </div>
-                <div class="radio radio-danger">
-                    <input id="indentationStyleTabs" type="radio" name="indentationStyle" value="tabs" onchange="onOptionValueChanged();" />
-                    <label for="indentationStyleTabs">Tabs</label>
+
+                <div class="optionComponent">
+                    <label id="spacesPerIndentLabel">Spaces per indent: 4</label>
+                    <br />
+                    <!-- data-slider-value="2" corresponds to 4 spaces per indent -->
+                    <input id="spacesPerIndent"
+                           type="text"
+                           data-provide="slider"
+                           data-slider-id="spacesPerIndentSlider"
+                           data-slider-min="0"
+                           data-slider-max="3"
+                           data-slider-value="2"
+                           data-slider-tooltip="hide" />
                 </div>
-                <div class="radio radio-danger">
-                    <input id="indentationStyleSpaces" type="radio" name="indentationStyle" value="spaces" onchange="onOptionValueChanged();" />
-                    <label for="indentationStyleSpaces">Spaces</label>
-                </div>
+
+                <br class="clear" />
             </div>
             <div class="optionGroup">
                 <div class="checkbox checkbox-success">

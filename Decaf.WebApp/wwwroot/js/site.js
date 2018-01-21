@@ -20,6 +20,7 @@ function convertCode() {
         csharpLanguageVersion: getCsharpLangVersion(getSliderValue("csharpLangVersion")),
         indentationStyle: getRadioValue("indentationStyle"),
         parseAs: getRadioValue("parseAs"),
+        spacesPerIndent: getSpacesPerIndent(getSliderValue("spacesPerIndent")),
         translateCollectionTypes: getCheckboxValue("translateCollectionTypes"),
         unqualifyTypeNames: getCheckboxValue("unqualifyTypeNames"),
         useVarInDeclarations: getCheckboxValue("useVarInDeclarations"),
@@ -36,7 +37,7 @@ function getCheckboxValue(id) {
 }
 
 function getCsharpLangVersion(sliderValue) {
-    var langVersions = [
+    var values = [
         "1",
         "2",
         "3",
@@ -48,7 +49,7 @@ function getCsharpLangVersion(sliderValue) {
         "7.2",
         "latest"
     ];
-    return langVersions[sliderValue];
+    return values[sliderValue];
 }
 
 function getRadioValue(name) {
@@ -65,6 +66,16 @@ function getRadioValue(name) {
 
 function getSliderValue(id) {
     return document.getElementById(id).value;
+}
+
+function getSpacesPerIndent(sliderValue) {
+    var values = [
+        1,
+        2,
+        4,
+        8
+    ];
+    return values[sliderValue];
 }
 
 function getUrl(url, callback) {
@@ -107,6 +118,11 @@ function onOptionValueChanged() {
     convertCode();
 }
 
+function onSpacesPerIndentSlide(slideEvent) {
+    var label = document.getElementById("spacesPerIndentLabel");
+    label.textContent = "Spaces per indent: " + getSpacesPerIndent(slideEvent.value);
+}
+
 function setResult(data) {
     // Passing -1 positions the (invisible) cursor for 'output' at the start.
     // It ensures that the div is always scrolled to the left as much as possible, and prevents the text of the div from being highlighted.
@@ -140,6 +156,11 @@ output.$blockScrolling = Infinity; // Disables some warning
 output.renderer.$cursorLayer.element.style.display = "none"; // Disables the cursor
 
 // TODO: Don't use jQuery here.
+// TODO: Only fire 'onOptionValueChanged' when the value after handle release is different from the original value.
 $("#csharpLangVersion").slider()
     .on("slide", onCsharpLangVersionSlide)
+    .on("slideStop", onOptionValueChanged);
+
+$("#spacesPerIndent").slider()
+    .on("slide", onSpacesPerIndentSlide)
     .on("slideStop", onOptionValueChanged);

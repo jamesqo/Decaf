@@ -15,6 +15,15 @@ label {
 	clear: both;
 }
 
+.optionComponent {
+	float: left;
+	margin-left: 5em;
+}
+
+.optionComponent:first-child {
+	margin-left: 0;
+}
+
 .optionGroup {
 	margin-top: 1.5em;
 }
@@ -27,11 +36,11 @@ label {
 	margin-top: 0;
 }
 
-#csharpLangVersionSlider .slider-handle {
+.slider-handle {
 	background: #0000f0;
 }
 
-#csharpLangVersionSlider .slider-selection {
+.slider-selection {
 	background: #8080ff;
 }
 
