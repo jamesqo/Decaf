@@ -44,6 +44,10 @@ label {
 	background: #8080ff;
 }
 
+#container {
+	height: 90vh;
+}
+
 #input,
 #output {
 	font-family: Inconsolata, Consolas, 'Lucida Console', monospace;
@@ -61,6 +65,8 @@ label {
 
 #inputOutputContainer {
 	margin-top: 1.5em;
+	height: 60%;
+	overflow: auto;
 }
 
 #leftSide {
@@ -72,6 +78,7 @@ label {
 	margin: 0 auto;
 	margin-top: 1.5em;
 	width: 95%;
+	height: 40%;
 }
 
 /* Disables brace-matching for #output */
