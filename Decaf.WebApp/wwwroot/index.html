@@ -54,15 +54,15 @@
             <div class="optionGroup">
                 <label>Indentation style:</label>
                 <div class="radio radio-danger">
-                    <input id="indentationStylePreserve" type="radio" name="indentationStyle" value="preserve" checked />
+                    <input id="indentationStylePreserve" type="radio" name="indentationStyle" value="preserve" checked onchange="onOptionValueChanged();" />
                     <label for="indentationStylePreserve">Preserve</label>
                 </div>
                 <div class="radio radio-danger">
-                    <input id="indentationStyleTabs" type="radio" name="indentationStyle" value="tabs" />
+                    <input id="indentationStyleTabs" type="radio" name="indentationStyle" value="tabs" onchange="onOptionValueChanged();" />
                     <label for="indentationStyleTabs">Tabs</label>
                 </div>
                 <div class="radio radio-danger">
-                    <input id="indentationStyleSpaces" type="radio" name="indentationStyle" value="spaces" />
+                    <input id="indentationStyleSpaces" type="radio" name="indentationStyle" value="spaces" onchange="onOptionValueChanged();" />
                     <label for="indentationStyleSpaces">Spaces</label>
                 </div>
             </div>
