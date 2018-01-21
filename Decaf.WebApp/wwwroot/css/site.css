@@ -1,4 +1,9 @@
-﻿.clear {
+﻿* {
+	margin: 0;
+	padding: 0;
+}
+
+.clear {
 	clear: both;
 }
 
@@ -17,6 +22,10 @@
 	width: 90%;
 }
 
+#inputOutputContainer {
+	margin-top: 1.5em;
+}
+
 #leftSide {
 	float: left;
 	width: 50%;
@@ -24,7 +33,7 @@
 
 #optionsContainer {
 	margin: 0 auto;
-	margin-top: 1em;
+	margin-top: 1.5em;
 	width: 95%;
 }
 
