@@ -1,39 +1,23 @@
-﻿var input, output;
+﻿var event = ace.require("ace/lib/event");
 
-function onSubmitClick() {
+const KEYDOWN_FLUSH_THRESHOLD = 5;
+
+var input, output;
+var keydownsToFlush = 0;
+
+function convertCode() {
+    keydownsToFlush = 0;
+
     var query = "api/convert/?javaCode=" + encodeURIComponent(input.getValue());
     getUrl(query, loadResults);
 }
 
-function changeSubmitMessage() {
-    var submitButton = document.getElementById("submitButton");
-    var messages = [
-        "Extract Cocoa Beans",
-        "Decrease Work Productivity",
-        "Sharpen The Mind",
-        "Reduce Energy Levels",
-        "Prevent Afternoon Sleepiness",
-        "Brew Your Soul",
-        "Increase Longevity"
-    ];
-
-    var currentMessage = submitButton.value;
-    var newMessage;
-
-    do {
-        var randIndex = Math.floor(Math.random() * messages.length);
-        newMessage = messages[randIndex];
-    } while (newMessage === currentMessage);
-
-    submitButton.value = newMessage;
-}
-
 function getUrl(url, callback) {
-    enableSubmit(false);
+    // TODO: Indicate you are busy.
     var xhr = new XMLHttpRequest();
     xhr.open("GET", url, true);
     xhr.setRequestHeader("Accept", "text/html");
-    xhr.onreadystatechange = function() {
+    xhr.onreadystatechange = function () {
         if (xhr.readyState === 4) {
             var data = xhr.responseText;
             if (typeof data === "string" && data.length > 0) {
@@ -41,7 +25,7 @@ function getUrl(url, callback) {
             }
         }
 
-        enableSubmit(true);
+        // TODO: Indicate you are no longer busy.
     };
     xhr.send();
     return xhr;
@@ -58,7 +42,13 @@ function setResult(data) {
 
 function loadResults(data) {
     setResult(data);
-    changeSubmitMessage();
+}
+
+function onInputKeydown(e) {
+    keydownsToFlush++;
+    if (keydownsToFlush === KEYDOWN_FLUSH_THRESHOLD) {
+        convertCode();
+    }
 }
 
 input = ace.edit("input");
@@ -70,6 +60,8 @@ input.setOptions({
     showGutter: false,
     theme: "ace/theme/visualstudio"
 });
+var el = input.textInput.getElement();
+event.addListener(el, "keydown", onInputKeydown);
 
 output = ace.edit("output");
 output.setOptions({
