@@ -16,6 +16,7 @@ function convertCode() {
     keydownsToFlush = 0;
 
     var params = {
+        csharpLanguageVersion: getCsharpLangVersion(getValue("csharpLangVersion")),
         javaCode: input.getValue(),
         translateCollectionTypes: getCheckboxValue("translateCollectionTypes"),
         unqualifyTypeNames: getCheckboxValue("unqualifyTypeNames"),
@@ -68,11 +69,15 @@ function getUrl(url, callback) {
     return xhr;
 }
 
+function getValue(id) {
+    return document.getElementById(id).value;
+}
+
 function loadResults(data) {
     setResult(data);
 }
 
-function onCsharpLangVersionChanged(slideEvent) {
+function onCsharpLangVersionSlide(slideEvent) {
     var label = document.getElementById("csharpLangVersionLabel");
     label.textContent = "C# language version: " + getCsharpLangVersion(slideEvent.value);
 }
@@ -84,7 +89,7 @@ function onInputKeydown(e) {
     }
 }
 
-function onOptionChanged() {
+function onOptionValueChanged() {
     convertCode();
 }
 
@@ -103,6 +108,7 @@ input.setOptions({
     showGutter: false,
     theme: "ace/theme/visualstudio"
 });
+input.$blockScrolling = Infinity; // Disables some warning
 var el = input.textInput.getElement();
 event.addListener(el, "keydown", onInputKeydown);
 
@@ -116,9 +122,10 @@ output.setOptions({
     showGutter: false,
     theme: "ace/theme/visualstudio"
 });
+output.$blockScrolling = Infinity; // Disables some warning
 output.renderer.$cursorLayer.element.style.display = "none"; // Disables the cursor
 
 // TODO: Don't use jQuery here.
 $("#csharpLangVersion").slider()
-    .on("slide", onCsharpLangVersionChanged)
-    .data("slider");
+    .on("slide", onCsharpLangVersionSlide)
+    .on("slideStop", onOptionValueChanged);
