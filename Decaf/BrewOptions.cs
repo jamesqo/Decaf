@@ -11,10 +11,11 @@ namespace CoffeeMachine
         public string AnonymousClassNameFormat { get; set; } = "Anon{0}";
         public CancellationToken CancellationToken { get; set; } = CancellationToken.None;
         public LanguageVersion CSharpLanguageVersion { get; set; } = LanguageVersion.Latest;
-        public bool IndentWithSpaces { get; set; } = true;
+        public IndentationStyle IndentationStyle { get; set; } = IndentationStyle.Preserve;
         public CodeKind ParseAs { get; set; } = CodeKind.Infer;
         public int SpacesPerIndent { get; set; } = 4;
         public bool TranslateCollectionTypes { get; set; } = true;
+        public bool UnqualifyTypeNames { get; set; } = false;
         public bool UseVarInDeclarations { get; set; } = true;
 
         internal string FormatAnonymousClassName(string baseClass)

@@ -7,11 +7,21 @@ namespace CoffeeMachine.WebApp.Controllers
     public class ConvertController : Controller
     {
         [HttpGet]
-        public string Get(string javaCode)
+        public string Get(
+            string javaCode,
+            bool translateCollectionTypes,
+            bool unqualifyTypeNames,
+            bool useVarInDeclarations)
         {
             try
             {
-                return Decaf.Brew(javaCode);
+                var options = new BrewOptions
+                {
+                    TranslateCollectionTypes = translateCollectionTypes,
+                    UnqualifyTypeNames = unqualifyTypeNames,
+                    UseVarInDeclarations = useVarInDeclarations
+                };
+                return Decaf.Brew(javaCode, options);
             }
             catch (Exception e)
             {

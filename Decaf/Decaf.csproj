@@ -25,6 +25,9 @@
     <Compile Update="CodeKind.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="IndentationStyle.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Internal\CSharpClassInfo.cs">
       <SubType>Code</SubType>
     </Compile>
