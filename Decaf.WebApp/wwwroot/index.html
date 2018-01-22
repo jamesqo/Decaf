@@ -95,8 +95,9 @@
                     </div>
 
                     <div class="optionComponent">
-                        <!-- TODO: Gray this label out initially. -->
-                        <label id="spacesPerIndentLabel">Spaces per indent: 4</label>
+                        <!-- 'disabled' is not applicable to labels, so the ':disabled' pseudo-class won't work for them. -->
+                        <!-- Instead, mark the label with 'data-disabled' and query for label[data-disabled="true"]. -->
+                        <label id="spacesPerIndentLabel" data-disabled="true">Spaces per indent: 4</label>
                         <br />
                         <!-- data-slider-value="2" corresponds to 4 spaces per indent -->
                         <input id="spacesPerIndent"

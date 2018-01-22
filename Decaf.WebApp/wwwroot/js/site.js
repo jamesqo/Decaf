@@ -146,10 +146,10 @@ function setResult(data) {
 
 function setSpacesPerIndentEnabled(enabled) {
     if (enabled) {
-        // TODO: Make label text black
+        $("#spacesPerIndentLabel").attr("data-disabled", false);
         $("#spacesPerIndent").slider("enable");
     } else {
-        // TODO: Gray out label text
+        $("#spacesPerIndentLabel").attr("data-disabled", true);
         $("#spacesPerIndent").slider("disable");
     }
 }

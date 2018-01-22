@@ -11,6 +11,10 @@ label {
 	font-weight: normal;
 }
 
+label[data-disabled="true"] {
+	color: #999999;
+}
+
 .clear {
 	clear: both;
 }
@@ -42,6 +46,10 @@ label {
 
 .slider-selection {
 	background: #8080ff;
+}
+
+.slider-disabled .slider-selection {
+	background: inherit;
 }
 
 #container {
