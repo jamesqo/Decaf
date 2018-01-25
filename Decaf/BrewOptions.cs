@@ -8,7 +8,7 @@ namespace CoffeeMachine
     {
         public static BrewOptions Default { get; } = new BrewOptions();
 
-        public string AnonymousClassNameFormat { get; set; } = "Anon{0}";
+        public string AnonymousClassNameFormat { get; set; } = "Anon{Type}";
         public CancellationToken CancellationToken { get; set; } = CancellationToken.None;
         public LanguageVersion CSharpLanguageVersion { get; set; } = LanguageVersion.Latest;
         public IndentationStyle IndentationStyle { get; set; } = IndentationStyle.Preserve;
@@ -20,7 +20,7 @@ namespace CoffeeMachine
 
         internal string FormatAnonymousClassName(string baseClass)
         {
-            return string.Format(AnonymousClassNameFormat, baseClass);
+            return AnonymousClassNameFormat.Replace("{Type}", baseClass);
         }
 
         internal CSharpParseOptions GetCSharpParseOptions()
