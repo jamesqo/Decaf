@@ -20,6 +20,7 @@ namespace CoffeeMachine
 
         internal string FormatAnonymousClassName(string baseClass)
         {
+            // TODO: Ignore case, unescape '{{' and '}}'?
             return AnonymousClassNameFormat.Replace("{Type}", baseClass);
         }
 
