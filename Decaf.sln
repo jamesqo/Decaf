@@ -1,13 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2010
+VisualStudioVersion = 15.0.27130.2020
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Decaf", "Decaf\Decaf.csproj", "{F7149EF3-B3BF-492C-BCB2-375737BDDB05}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Decaf.Tests", "Decaf.Tests\Decaf.Tests.csproj", "{675B65F1-9F2E-4924-99DC-0B8A5F19E51F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Decaf.WebApp", "Decaf.WebApp\Decaf.WebApp.csproj", "{689FF423-07AB-407A-BBE5-D98D30125601}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Decaf.WebApp", "Decaf.WebApp\Decaf.WebApp.csproj", "{689FF423-07AB-407A-BBE5-D98D30125601}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Decaf.JParser", "Decaf.JParser\Decaf.JParser.csproj", "{235A5A4C-9DC8-43EC-9E0B-AB26898FCCB9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Decaf.Internal", "Decaf.Internal\Decaf.Internal.csproj", "{0039F011-84DF-4947-AAAA-086DA6099862}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +31,14 @@ Global
 		{689FF423-07AB-407A-BBE5-D98D30125601}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{689FF423-07AB-407A-BBE5-D98D30125601}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{689FF423-07AB-407A-BBE5-D98D30125601}.Release|Any CPU.Build.0 = Release|Any CPU
+		{235A5A4C-9DC8-43EC-9E0B-AB26898FCCB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{235A5A4C-9DC8-43EC-9E0B-AB26898FCCB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{235A5A4C-9DC8-43EC-9E0B-AB26898FCCB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{235A5A4C-9DC8-43EC-9E0B-AB26898FCCB9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0039F011-84DF-4947-AAAA-086DA6099862}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0039F011-84DF-4947-AAAA-086DA6099862}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0039F011-84DF-4947-AAAA-086DA6099862}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0039F011-84DF-4947-AAAA-086DA6099862}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

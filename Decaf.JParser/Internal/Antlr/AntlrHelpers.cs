@@ -2,7 +2,7 @@
 using Antlr4.Runtime.Tree;
 using CoffeeMachine.Internal.Diagnostics;
 
-namespace CoffeeMachine.Internal.Grammars
+namespace CoffeeMachine.JParser.Internal.Antlr
 {
     internal static class AntlrHelpers
     {

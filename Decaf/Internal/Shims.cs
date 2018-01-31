@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace CoffeeMachine.Internal
 {
-    internal static class NetCoreShims
+    internal static class Shims
     {
         public static void Deconstruct<TKey, TValue>(this KeyValuePair<TKey, TValue> pair, out TKey key, out TValue value)
         {

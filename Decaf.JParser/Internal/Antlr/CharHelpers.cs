@@ -1,4 +1,4 @@
-﻿namespace CoffeeMachine.Internal.Grammars
+﻿namespace CoffeeMachine.JParser.Internal.Antlr
 {
     internal static class CharHelpers
     {

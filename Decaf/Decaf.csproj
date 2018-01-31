@@ -8,59 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Antlr4" Version="4.6.4" />
     <PackageReference Include="Microsoft.CodeAnalysis" Version="2.6.1" />
   </ItemGroup>
-  
+
   <ItemGroup>
-    <Antlr4 Include="Internal\Grammars\Java8.g4">
-      <Generator>MSBuild:Compile</Generator>
-      <CustomToolNamespace>CoffeeMachine.Internal.Grammars</CustomToolNamespace>
-      <Listener>false</Listener>
-      <Visitor>true</Visitor>
-    </Antlr4>
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Compile Update="CodeKind.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="IndentationStyle.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Internal\CSharpClassInfo.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Internal\CSharpConstants.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Internal\ConversionHelpers.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Internal\CSharpFormatter.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Internal\CSharpGlobalState.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Internal\Diagnostics\D.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Internal\Grammars\AntlrHelpers.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Internal\Grammars\Java8GrammarHelpers.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Internal\Messenger.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Internal\RoslynHelpers.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Internal\Television.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <ProjectReference Include="..\Decaf.Internal\Decaf.Internal.csproj" />
+    <ProjectReference Include="..\Decaf.JParser\Decaf.JParser.csproj" />
   </ItemGroup>
 
 </Project>

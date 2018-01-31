@@ -1,6 +1,6 @@
-﻿using static CoffeeMachine.Internal.Grammars.Java8Parser;
+﻿using static CoffeeMachine.JParser.Internal.Antlr.Java8Parser;
 
-namespace CoffeeMachine.Internal.Grammars
+namespace CoffeeMachine.JParser.Internal.Antlr
 {
     internal static class Java8GrammarHelpers
     {

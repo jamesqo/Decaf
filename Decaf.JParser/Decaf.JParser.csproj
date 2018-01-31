@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.3</TargetFramework>
+    <RootNamespace>CoffeeMachine.JParser</RootNamespace>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Antlr4" Version="4.6.4" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Antlr4 Include="Internal\Antlr\Java8.g4">
+      <Generator>MSBuild:Compile</Generator>
+      <CustomToolNamespace>CoffeeMachine.JParser.Internal.Antlr</CustomToolNamespace>
+      <Listener>false</Listener>
+      <Visitor>true</Visitor>
+    </Antlr4>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\Decaf.Internal\Decaf.Internal.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Compile Update="JParseOptions.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+
+</Project>

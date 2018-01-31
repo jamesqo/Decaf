@@ -6,7 +6,7 @@ namespace CoffeeMachine
 {
     public class BrewOptions
     {
-        public static BrewOptions Default { get; } = new BrewOptions();
+        internal static BrewOptions Default { get; } = new BrewOptions();
 
         public string AnonymousClassNameFormat { get; set; } = "Anon{Type}";
         public CancellationToken CancellationToken { get; set; } = CancellationToken.None;

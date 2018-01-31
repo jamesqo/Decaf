@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 namespace CoffeeMachine.Internal.Diagnostics
 {
-    internal static class D
+    public static class D
     {
         [Conditional("DEBUG")]
         public static void AssertEqual<T>(T actual, T expected)
