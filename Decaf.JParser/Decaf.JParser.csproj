@@ -27,7 +27,22 @@
     <Compile Update="Internal\Antlr\ConverterVisitor.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="JTree.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Nodes\JClassBody.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Nodes\JClassBodyDeclaration.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Nodes\JClassDeclaration.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="JParseOptions.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Nodes\JUnknown.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
