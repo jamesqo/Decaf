@@ -47,7 +47,7 @@ namespace CoffeeMachine.JParser
                 case JNodeKind.Expression:
                     return parser.expression();
                 default:
-                    D.Fail($"Unrecognized {nameof(JNodeKind)} value: {options.ParseAs}");
+                    Debug.Fail($"Unrecognized {nameof(JNodeKind)} value: {options.ParseAs}");
                     return default;
             }
         }

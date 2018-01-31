@@ -85,8 +85,8 @@ namespace CoffeeMachine.Internal
         /// </summary>
         public static string ConvertMethodName(string javaMethodName)
         {
-            D.AssertTrue(!string.IsNullOrEmpty(javaMethodName));
-            D.AssertTrue(!javaMethodName.Contains("."));
+            Debug.Assert(!string.IsNullOrEmpty(javaMethodName));
+            Debug.Assert(!javaMethodName.Contains("."));
 
             return CamelCaseToPascalCase(javaMethodName);
         }
@@ -126,10 +126,10 @@ namespace CoffeeMachine.Internal
         /// </summary>
         public static string GetPackageName(string javaTypeName)
         {
-            D.AssertTrue(!string.IsNullOrEmpty(javaTypeName));
+            Debug.Assert(!string.IsNullOrEmpty(javaTypeName));
 
             string[] parts = javaTypeName.Split('.', StringSplitOptions.RemoveEmptyEntries);
-            D.AssertTrue(parts.Length > 0);
+            Debug.Assert(parts.Length > 0);
             Array.Resize(ref parts, parts.Length - 1);
             return string.Join(".", parts);
         }
@@ -223,7 +223,7 @@ namespace CoffeeMachine.Internal
 
             string UppercaseToPascalCase(string word)
             {
-                D.AssertTrue(IsYellCase(word));
+                Debug.Assert(IsYellCase(word));
 
                 char[] buffer = word.ToCharArray();
                 for (int i = 1; i < word.Length; i++)

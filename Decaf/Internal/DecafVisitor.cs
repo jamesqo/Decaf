@@ -76,7 +76,7 @@ namespace CoffeeMachine.Internal
                 case RULE_expression:
                     return CodeKind.Expression;
                 default:
-                    D.Fail($"Unrecognized rule index: {child.RuleIndex}");
+                    Debug.Fail($"Unrecognized rule index: {child.RuleIndex}");
                     return default;
             }
         }
@@ -94,7 +94,7 @@ namespace CoffeeMachine.Internal
 
         private void MovePast(ITerminalNode currentNode)
         {
-            D.AssertNotNull(currentNode);
+            Debug.AssertNotNull(currentNode);
 
             ProcessHiddenTokensBefore(currentNode.Symbol);
             _rstate.TokenIndex++;
@@ -102,7 +102,7 @@ namespace CoffeeMachine.Internal
 
         private void MovePast(ParserRuleContext currentContext)
         {
-            D.AssertNotNull(currentContext);
+            Debug.AssertNotNull(currentContext);
 
             ProcessHiddenTokensBefore(currentContext.Start);
             _rstate.TokenIndex += currentContext.DescendantTokenCount();
@@ -110,7 +110,7 @@ namespace CoffeeMachine.Internal
 
         private void MovePast(IParseTree currentTree)
         {
-            D.AssertNotNull(currentTree);
+            Debug.AssertNotNull(currentTree);
 
             switch (currentTree)
             {
@@ -121,14 +121,14 @@ namespace CoffeeMachine.Internal
                     MovePast(currentContext);
                     break;
                 default:
-                    D.Fail($"Unrecognized {nameof(IParseTree)} subclass: {currentTree.GetType()}");
+                    Debug.Fail($"Unrecognized {nameof(IParseTree)} subclass: {currentTree.GetType()}");
                     break;
             }
         }
 
         private void ProcessHiddenToken(IToken hiddenToken)
         {
-            D.AssertNotNull(hiddenToken);
+            Debug.AssertNotNull(hiddenToken);
 
             Write(hiddenToken.Text);
             _rstate.TokenIndex++;
@@ -136,7 +136,7 @@ namespace CoffeeMachine.Internal
 
         private void ProcessHiddenTokensBefore(IToken currentToken)
         {
-            D.AssertNotNull(currentToken);
+            Debug.AssertNotNull(currentToken);
 
             int start = _rstate.TokenIndex;
             int end = currentToken.TokenIndex;

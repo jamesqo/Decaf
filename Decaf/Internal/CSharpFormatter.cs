@@ -32,7 +32,7 @@ namespace CoffeeMachine.Internal
 
         private static SyntaxNode ParseCSharp(string code, BrewOptions options)
         {
-            D.AssertTrue(options.ParseAs != CodeKind.Infer, $"Update {nameof(options)} to reflect the kind of code that was parsed.");
+            Debug.Assert(options.ParseAs != CodeKind.Infer, $"Update {nameof(options)} to reflect the kind of code that was parsed.");
 
             var parseOptions = options.GetCSharpParseOptions();
             switch (options.ParseAs)
@@ -44,7 +44,7 @@ namespace CoffeeMachine.Internal
                 case CodeKind.Expression:
                     return SyntaxFactory.ParseExpression(code, options: parseOptions, consumeFullText: true);
                 default:
-                    D.Fail($"Unrecognized {nameof(CodeKind)} value: {options.ParseAs}");
+                    Debug.Fail($"Unrecognized {nameof(CodeKind)} value: {options.ParseAs}");
                     return default;
             }
         }
@@ -94,7 +94,7 @@ namespace CoffeeMachine.Internal
             HashSet<string> usings,
             HashSet<string> usingStatics)
         {
-            D.AssertTrue(!root.Usings.Any(), "The generated C# code shouldn't have usings right after it is translated from Java.");
+            Debug.Assert(!root.Usings.Any(), "The generated C# code shouldn't have usings right after it is translated from Java.");
 
             return root
                 .AddUsings(usings.Select(CreateUsingDirective).ToArray())
