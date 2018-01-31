@@ -1,5 +1,4 @@
 using System;
-using CoffeeMachine.Internal;
 using CoffeeMachine.JParser;
 
 namespace CoffeeMachine
@@ -15,7 +14,9 @@ namespace CoffeeMachine
 
             options = options ?? BrewOptions.Default;
 
-            var tree = JNode.Parse(text, options.GetJParseOptions());
+            var tree = JNode.Parse(javaCode, options.GetJParseOptions());
+            // TODO
+            return null;
         }
     }
 }

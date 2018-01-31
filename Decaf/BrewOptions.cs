@@ -13,7 +13,7 @@ namespace CoffeeMachine
         public CancellationToken CancellationToken { get; set; } = CancellationToken.None;
         public LanguageVersion CSharpLanguageVersion { get; set; } = LanguageVersion.Latest;
         public IndentationStyle IndentationStyle { get; set; } = IndentationStyle.Preserve;
-        public CodeKind ParseAs { get; set; } = CodeKind.Infer;
+        public JNodeKind ParseAs { get; set; } = JNodeKind.Infer;
         public int SpacesPerIndent { get; set; } = 4;
         public bool TranslateCollectionTypes { get; set; } = true;
         public bool UnqualifyTypeNames { get; set; } = false;
@@ -35,7 +35,10 @@ namespace CoffeeMachine
 
         internal JParseOptions GetJParseOptions()
         {
-
+            return new JParseOptions
+            {
+                ParseAs = ParseAs
+            };
         }
     }
 }

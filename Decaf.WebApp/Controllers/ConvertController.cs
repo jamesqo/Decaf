@@ -1,4 +1,5 @@
 ﻿using System;
+using CoffeeMachine.JParser;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp;
 
@@ -12,7 +13,7 @@ namespace CoffeeMachine.WebApp.Controllers
             string javaCode,
             LanguageVersion csharpLanguageVersion,
             IndentationStyle indentationStyle,
-            CodeKind parseAs,
+            JNodeKind parseAs,
             int spacesPerIndent,
             bool translateCollectionTypes,
             bool unqualifyTypeNames,
