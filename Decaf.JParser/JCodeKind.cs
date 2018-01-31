@@ -1,6 +1,6 @@
 ﻿namespace CoffeeMachine.JParser
 {
-    public enum JNodeKind
+    public enum JCodeKind
     {
         /// <summary>
         /// Attempts to infer the kind of node being parsed.

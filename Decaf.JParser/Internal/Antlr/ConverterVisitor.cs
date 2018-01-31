@@ -6,15 +6,15 @@ namespace CoffeeMachine.JParser.Internal.Antlr
     {
         private readonly JNode _root;
 
-        private ConverterVisitor()
+        private ConverterVisitor(IParseTree tree)
         {
         }
 
-        public static JNode ConvertAntlrTree(IParseTree tree)
+        public static JTree ConvertAntlrTree(IParseTree tree)
         {
-            var visitor = new ConverterVisitor();
+            var visitor = new ConverterVisitor(tree);
             visitor.Visit(tree);
-            return visitor._root;
+            return new JTree(visitor._root);
         }
     }
 }

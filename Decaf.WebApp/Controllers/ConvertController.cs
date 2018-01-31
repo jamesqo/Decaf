@@ -13,7 +13,7 @@ namespace CoffeeMachine.WebApp.Controllers
             string javaCode,
             LanguageVersion csharpLanguageVersion,
             IndentationStyle indentationStyle,
-            JNodeKind parseAs,
+            JCodeKind parseAs,
             int spacesPerIndent,
             bool translateCollectionTypes,
             bool unqualifyTypeNames,

@@ -3,10 +3,11 @@ using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using CoffeeMachine.Internal.Diagnostics;
 using CoffeeMachine.JParser.Internal.Antlr;
+using CoffeeMachine.JParser.Nodes;
 
 namespace CoffeeMachine.JParser
 {
-    public class JNode
+    public class JTree
     {
         private class AntlrPipeline
         {
@@ -16,7 +17,14 @@ namespace CoffeeMachine.JParser
             public Java8Parser Parser { get; set; }
         }
 
-        public static JNode Parse(string text, JParseOptions options = null)
+        internal JTree(JNode root)
+        {
+            Root = root;
+        }
+
+        public JNode Root { get; }
+
+        public static JTree Parse(string text, JParseOptions options = null)
         {
             if (text == null)
             {
@@ -36,18 +44,18 @@ namespace CoffeeMachine.JParser
 
             switch (options.ParseAs)
             {
-                case JNodeKind.Infer:
+                case JCodeKind.Infer:
                     return parser.codeSnippet();
-                case JNodeKind.CompilationUnit:
+                case JCodeKind.CompilationUnit:
                     return parser.compilationUnit();
-                case JNodeKind.ClassBody:
+                case JCodeKind.ClassBody:
                     return parser.classBodyDeclarations();
-                case JNodeKind.MethodBody:
+                case JCodeKind.MethodBody:
                     return parser.blockStatements();
-                case JNodeKind.Expression:
+                case JCodeKind.Expression:
                     return parser.expression();
                 default:
-                    Debug.Fail($"Unrecognized {nameof(JNodeKind)} value: {options.ParseAs}");
+                    Debug.Fail($"Unrecognized {nameof(JCodeKind)} value: {options.ParseAs}");
                     return default;
             }
         }
@@ -62,7 +70,7 @@ namespace CoffeeMachine.JParser
             return pl;
         }
 
-        private static JNode ConvertFromAntlr(IParseTree antlrTree)
+        private static JTree ConvertFromAntlr(IParseTree antlrTree)
         {
             return ConverterVisitor.ConvertAntlrTree(antlrTree);
         }
