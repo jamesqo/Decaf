@@ -64,8 +64,7 @@ namespace CoffeeMachine.JParser
 
         private static JNode ConvertFromAntlr(IParseTree antlrTree)
         {
-            // TODO
-            return null;
+            return ConverterVisitor.ConvertAntlrTree(antlrTree);
         }
     }
 }

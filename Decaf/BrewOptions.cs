@@ -1,4 +1,5 @@
 ﻿using System.Threading;
+using CoffeeMachine.JParser;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
@@ -30,6 +31,11 @@ namespace CoffeeMachine
                 languageVersion: CSharpLanguageVersion,
                 // We want to parse the output as a C# script because that allows for top-level statements/method declarations.
                 kind: SourceCodeKind.Script);
+        }
+
+        internal JParseOptions GetJParseOptions()
+        {
+
         }
     }
 }

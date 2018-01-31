@@ -5,8 +5,10 @@ namespace CoffeeMachine.Internal.Diagnostics
 {
     public static class Debug
     {
+        private const string DefaultMessage = "[No message provided]";
+
         [Conditional("DEBUG")]
-        public static void Assert(bool condition, string message = "[No message provided]")
+        public static void Assert(bool condition, string message = DefaultMessage)
         {
             if (!condition)
             {
